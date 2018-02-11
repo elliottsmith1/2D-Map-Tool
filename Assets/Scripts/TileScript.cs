@@ -18,8 +18,11 @@ public class TileScript : MonoBehaviour {
     public SpriteRenderer sprite_rend;
     private int difficulty;
     private float delay_timer = 0.0f;
-    private float delay_threshold = 1.0f;
+    private float delay_threshold = 0.5f;
     private bool timer_on = false;
+    private bool spawn_rooms = false;
+
+    private MapCreator map_creator;
 
     [SerializeField] Sprite bottom_left;
     [SerializeField] Sprite bottom_right;
@@ -56,7 +59,7 @@ public class TileScript : MonoBehaviour {
 
     [SerializeField] Sprite blank;
 
-    [SerializeField] GameObject[] adjacent_tiles;
+    public GameObject[] adjacent_tiles;
 
     // Use this for initialization
     void Start ()
@@ -64,6 +67,8 @@ public class TileScript : MonoBehaviour {
         adjacent_tiles = new GameObject[4];
 
         sprite_rend = GetComponent<SpriteRenderer>();
+
+        map_creator = GameObject.Find("Map Creator").GetComponent<MapCreator>();
     }
 	
 	// Update is called once per frame
@@ -80,6 +85,11 @@ public class TileScript : MonoBehaviour {
     public void SetDifficulty(int _dif)
     {
         difficulty = _dif;
+    }
+
+    public void SetSpawnRooms(bool _spwn)
+    {
+        spawn_rooms = _spwn;
     }
 
     public void ResetTile()
@@ -483,11 +493,19 @@ public class TileScript : MonoBehaviour {
 
                 if (tile_rand == difficulty - 4)
                 {
-                    sprite_rend.sprite = door_bottom;
-                    gameObject.tag = "RoomTileWall";
-                    room_tile_already_set = true;
-                    //open_down = true;
-                    //open_up = true;
+                    if (spawn_rooms)
+                    {
+                        sprite_rend.sprite = door_bottom;
+                        gameObject.tag = "RoomTileWall";
+                        room_tile_already_set = true;
+
+                        map_creator.SpawnRoom(this.gameObject);
+                    }
+                    else
+                    {
+                        ChangeTile();
+                        return;
+                    }
                 }
 
                 if (tile_rand == difficulty - 3)
@@ -525,11 +543,20 @@ public class TileScript : MonoBehaviour {
 
                 if (tile_rand == difficulty - 4)
                 {
-                    sprite_rend.sprite = door_top;
-                    gameObject.tag = "RoomTileWall";
-                    room_tile_already_set = true;
-                    //open_down = true;
-                    //open_up = true;
+                    if (spawn_rooms)
+                    { 
+                        sprite_rend.sprite = door_top;
+                        gameObject.tag = "RoomTileWall";
+                        room_tile_already_set = true;
+
+                        map_creator.SpawnRoom(this.gameObject);
+                    }
+
+                    else
+                    {
+                        ChangeTile();
+                        return;
+                    }
                 }
 
                 if (tile_rand == difficulty - 3)
@@ -567,11 +594,20 @@ public class TileScript : MonoBehaviour {
 
                 if (tile_rand == difficulty - 4)
                 {
-                    sprite_rend.sprite = door_left;
-                    gameObject.tag = "RoomTileWall";
-                    room_tile_already_set = true;
-                    //open_right = true;
-                    //open_left = true;
+                    if (spawn_rooms)
+                    {
+                        sprite_rend.sprite = door_left;
+                        gameObject.tag = "RoomTileWall";
+                        room_tile_already_set = true;
+
+                        map_creator.SpawnRoom(this.gameObject);
+                    }
+
+                    else
+                    {
+                        ChangeTile();
+                        return;
+                    }
                 }
 
                 if (tile_rand == difficulty - 3)
@@ -609,11 +645,20 @@ public class TileScript : MonoBehaviour {
 
                 if (tile_rand == difficulty - 4)
                 {
-                    sprite_rend.sprite = door_right;
-                    gameObject.tag = "RoomTileWall";
-                    room_tile_already_set = true;
-                    //open_right = true;
-                    //open_left = true;
+                    if (spawn_rooms)
+                    {
+                        sprite_rend.sprite = door_right;
+                        gameObject.tag = "RoomTileWall";
+                        room_tile_already_set = true;
+
+                        map_creator.SpawnRoom(this.gameObject);
+                    }
+
+                    else
+                    {
+                        ChangeTile();
+                        return;
+                    }
                 }
 
                 if (tile_rand == difficulty - 3)

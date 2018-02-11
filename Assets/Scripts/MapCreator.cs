@@ -21,6 +21,13 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] Sprite junction;
     [SerializeField] Sprite blank;
 
+    [SerializeField] Sprite door_right;
+    [SerializeField] Sprite door_top;
+    [SerializeField] Sprite door_left;
+    [SerializeField] Sprite door_bottom;
+
+    [SerializeField] bool spawn_rooms = false;
+
     [SerializeField] Difficulty difficulty;
     private int difficulty_num; 
 
@@ -91,6 +98,7 @@ public class MapCreator : MonoBehaviour {
 
             tile.GetComponent<TileScript>().id = i;
             tile.GetComponent<TileScript>().SetDifficulty(difficulty_num);
+            tile.GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
 
             tiles[i] = Instantiate(tile, position, Quaternion.identity);
         }
@@ -143,6 +151,8 @@ public class MapCreator : MonoBehaviour {
             tiles[i].GetComponent<TileScript>().ResetTile();
             tiles[i].GetComponent<TileScript>().SetDifficulty(difficulty_num);
             tiles[i].GetComponent<TileScript>().tile_already_set = false;
+            tiles[i].GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
+
         }
 
         int tile_rand = Random.Range(0, tiles.Length);
@@ -153,5 +163,30 @@ public class MapCreator : MonoBehaviour {
         tiles[tile_rand].GetComponent<TileScript>().open_down = true;
 
         tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
+    }
+
+    public void SpawnRoom(GameObject _door)
+    {
+        //int room_height = Random.Range(1, 5);
+        //int room_width = Random.Range(1, 5);
+
+        //TileScript door = _door.GetComponent<TileScript>();
+
+        //GameObject[] walls_height = new GameObject[room_height * 2];
+        //GameObject[] walls_width = new GameObject[room_width * 2];
+
+
+        //for (int i = 1; i < room_width; i++)
+        //{
+        //    if (door.adjacent_tiles[1])
+        //    {
+        //        walls_width[i] = walls_width[i-1].GetComponent<TileScript>().adjacent_tiles[1];
+        //    }
+        //}
+
+        //if (_door.GetComponent<SpriteRenderer>().sprite == door_bottom)
+        //{
+            
+        //}
     }
 }
