@@ -446,8 +446,6 @@ public class TileScript : MonoBehaviour {
                     }
                 }
             }
-
-
         }
     }
 

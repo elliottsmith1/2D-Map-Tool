@@ -167,26 +167,29 @@ public class MapCreator : MonoBehaviour {
 
     public void SpawnRoom(GameObject _door)
     {
-        //int room_height = Random.Range(1, 5);
-        //int room_width = Random.Range(1, 5);
+        int room_height = Random.Range(1, 5);
+        int room_width = Random.Range(1, 5);
 
-        //TileScript door = _door.GetComponent<TileScript>();
+        TileScript door = _door.GetComponent<TileScript>();
 
-        //GameObject[] walls_height = new GameObject[room_height * 2];
-        //GameObject[] walls_width = new GameObject[room_width * 2];
+        GameObject[] room_floor_tiles = new GameObject[room_height * room_width];
 
+        if (door.sprite_rend.sprite = door_bottom)
+        {
+            room_floor_tiles[0] = _door.adjacent_tiles[2];
 
-        //for (int i = 1; i < room_width; i++)
-        //{
-        //    if (door.adjacent_tiles[1])
-        //    {
-        //        walls_width[i] = walls_width[i-1].GetComponent<TileScript>().adjacent_tiles[1];
-        //    }
-        //}
+            for (int i = 1; i < room_height; i++)
+            {
+                room_floor_tiles[i] = room_floor_tiles[i - 1].GetComponent<TileScript>().adjacent_tiles[2];
+            }
 
-        //if (_door.GetComponent<SpriteRenderer>().sprite == door_bottom)
-        //{
-            
-        //}
+            for (int i = 1; i < room_width; i++)
+            {
+                for (int j = 0; j < room_height; j++)
+                {
+                    room_floor_tiles[j + (room_height * i)] = room_floor_tiles[(i * room_width) + j].GetComponent<TileScript>().adjacent_tiles[1];
+                }
+            }
+        }
     }
 }
