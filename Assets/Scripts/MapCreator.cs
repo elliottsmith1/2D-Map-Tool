@@ -20,6 +20,7 @@ public class MapCreator : MonoBehaviour {
 
     [SerializeField] Sprite junction;
     [SerializeField] Sprite blank;
+    [SerializeField] Sprite room_blank;
 
     [SerializeField] Sprite door_right;
     [SerializeField] Sprite door_top;
@@ -165,10 +166,10 @@ public class MapCreator : MonoBehaviour {
         tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
     }
 
-    public void SpawnRoom(GameObject _door)
+    public bool SpawnRoom(GameObject _door)
     {
-        int room_height = Random.Range(1, 5);
-        int room_width = Random.Range(1, 5);
+        int room_height = Random.Range(3, 8);
+        int room_width = Random.Range(3, 8);
 
         TileScript door = _door.GetComponent<TileScript>();
 
@@ -176,20 +177,53 @@ public class MapCreator : MonoBehaviour {
 
         if (door.sprite_rend.sprite = door_bottom)
         {
-            room_floor_tiles[0] = _door.adjacent_tiles[2];
+            room_floor_tiles[0] = door.adjacent_tiles[2];
 
             for (int i = 1; i < room_height; i++)
             {
-                room_floor_tiles[i] = room_floor_tiles[i - 1].GetComponent<TileScript>().adjacent_tiles[2];
+                if (room_floor_tiles[i - 1])
+                {
+                    room_floor_tiles[i] = room_floor_tiles[i - 1].GetComponent<TileScript>().adjacent_tiles[2];
+                }
             }
 
             for (int i = 1; i < room_width; i++)
             {
                 for (int j = 0; j < room_height; j++)
                 {
-                    room_floor_tiles[j + (room_height * i)] = room_floor_tiles[(i * room_width) + j].GetComponent<TileScript>().adjacent_tiles[1];
+                    if (room_floor_tiles[j + (room_height * (i - 1))])
+                    {
+                        room_floor_tiles[j + (room_height * i)] = room_floor_tiles[j + (room_height * (i - 1))].GetComponent<TileScript>().adjacent_tiles[1];
+
+                        if (room_floor_tiles[j + (room_height * i)].tag != "Tile")
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < room_floor_tiles.Length; i++)
+            {
+                if (room_floor_tiles[i])
+                {
+                    TileScript floor_tile = room_floor_tiles[i].GetComponent<TileScript>();
+                    floor_tile.sprite_rend.sprite = room_blank;
+
+                    floor_tile.open_down = false;
+                    floor_tile.open_left = false;
+                    floor_tile.open_right = false;
+                    floor_tile.open_up = false;
+
+                    floor_tile.gameObject.tag = "RoomTile";
+                    floor_tile.room_tile_already_set = true;
+                    floor_tile.tile_already_set = true;
+
+
                 }
             }
         }
+
+        return true;
     }
 }

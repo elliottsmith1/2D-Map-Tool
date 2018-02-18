@@ -18,7 +18,7 @@ public class TileScript : MonoBehaviour {
     public SpriteRenderer sprite_rend;
     private int difficulty;
     private float delay_timer = 0.0f;
-    private float delay_threshold = 0.5f;
+    private float delay_threshold = 0.075f;
     private bool timer_on = false;
     private bool spawn_rooms = false;
 
@@ -75,6 +75,7 @@ public class TileScript : MonoBehaviour {
 	void Update ()
     {
         SetTile();
+        EdgeCases();
 
         if (timer_on)
         {
@@ -105,7 +106,7 @@ public class TileScript : MonoBehaviour {
 
     void OnTriggerStay2D(Collider2D other)
     {
-        if (other.tag == "Tile")
+        //if (other.tag == "Tile")
         {
             if (!adjacent_tiles[3])
             {
@@ -139,8 +140,6 @@ public class TileScript : MonoBehaviour {
                 }
             }
         }
-
-        SetTile();
     }
 
     public void SetTile()
@@ -149,307 +148,240 @@ public class TileScript : MonoBehaviour {
         {
             if (adjacent_tiles[i])
             {
-                if (adjacent_tiles[i].tag != gameObject.tag)
+                if ((gameObject.tag == "RoomTile") && (adjacent_tiles[i].tag == "Tile"))
                 {
                     ChangeRoomTile();
-                }
+                }                
             }
         }
 
-        if (adjacent_tiles[0])
-        {
-            if (adjacent_tiles[0].GetComponent<TileScript>().open_up)
-            {
-                open_down = true;
-                ChangeTile();
-            }
-        }
-
-        if (adjacent_tiles[1])
-        {
-            if (adjacent_tiles[1].GetComponent<TileScript>().open_left)
-            {
-                open_right = true;
-                ChangeTile();
-            }
-        }
-
-        if (adjacent_tiles[2])
-        {
-            if (adjacent_tiles[2].GetComponent<TileScript>().open_down)
-            {
-                open_up = true;
-                ChangeTile();
-            }
-        }
-
-        if (adjacent_tiles[3])
-        {
-            if (adjacent_tiles[3].GetComponent<TileScript>().open_right)
-            {
-                open_left = true;
-                ChangeTile();
-            }
-        } 
-    }
-
-    void ChangeRoomTile()
-    {
         if (!room_tile_already_set)
         {
-            int room_complexity = 2;
-
             if (adjacent_tiles[0])
             {
-                if (adjacent_tiles[0].tag == "RoomTileWall")
+                if (adjacent_tiles[0].GetComponent<TileScript>().open_up)
                 {
-                    Sprite adjacent_sprite = adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite;
-
-                    if ((adjacent_sprite == door_bottom) || (adjacent_sprite == room_bottom) || (adjacent_sprite == room_blank))
-                    {
-                        if (!timer_on)
-                        {
-                            timer_on = true;
-                        }
-
-                        if (delay_timer > delay_threshold)
-                        {
-                            sprite_rend.sprite = room_blank;
-                            gameObject.tag = "RoomTileWall";
-                            room_tile_already_set = true;
-                            tile_already_set = true;
-                        }
-                    }
-
-                    if ((adjacent_sprite == door_right) || (adjacent_sprite == room_right) || (adjacent_sprite == room_bottom_right))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_right;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_top_right;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
-
-                    if ((adjacent_sprite == door_left) || (adjacent_sprite == room_left) || (adjacent_sprite == room_bottom_left))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_left;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_top_left;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
-                }
-            }
-
-            if (adjacent_tiles[2])
-            {
-                if (adjacent_tiles[2].tag == "RoomTileWall")
-                {
-                    Sprite adjacent_sprite = adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite;
-
-                    if ((adjacent_sprite == door_top) || (adjacent_sprite == room_top) || (adjacent_sprite == room_blank))
-                    {
-                        if (!timer_on)
-                        {
-                            timer_on = true;
-                        }
-
-                        if (delay_timer > delay_threshold)
-                        {
-                            sprite_rend.sprite = room_blank;
-                            gameObject.tag = "RoomTileWall";
-                            room_tile_already_set = true;
-                            tile_already_set = true;
-                        }
-                    }
-
-                    if ((adjacent_sprite == door_right) || (adjacent_sprite == room_right) || (adjacent_sprite == room_top_right))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_right;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_bottom_right;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
-
-                    if ((adjacent_sprite == door_left) || (adjacent_sprite == room_left) || (adjacent_sprite == room_top_left))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_left;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_bottom_left;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
+                    open_down = true;
+                    ChangeTile();
                 }
             }
 
             if (adjacent_tiles[1])
             {
-                if (adjacent_tiles[1].tag == "RoomTileWall")
+                if (adjacent_tiles[1].GetComponent<TileScript>().open_left)
                 {
-                    Sprite adjacent_sprite = adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite;
+                    open_right = true;
+                    ChangeTile();
+                }
+            }
 
-                    if ((adjacent_sprite == door_right) || (adjacent_sprite == room_right) || (adjacent_sprite == room_blank))
-                    {
-                        if (!timer_on)
-                        {
-                            timer_on = true;
-                        }
-
-                        if (delay_timer > delay_threshold)
-                        {
-                            sprite_rend.sprite = room_blank;
-                            gameObject.tag = "RoomTileWall";
-                            room_tile_already_set = true;
-                            tile_already_set = true;
-                        }
-                    }
-
-                    if ((adjacent_sprite == door_bottom) || (adjacent_sprite == room_bottom) || (adjacent_sprite == room_bottom_right))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_bottom;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_bottom_left;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
-
-                    if ((adjacent_sprite == door_top) || (adjacent_sprite == room_top) || (adjacent_sprite == room_top_right))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_top;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_top_left;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
+            if (adjacent_tiles[2])
+            {
+                if (adjacent_tiles[2].GetComponent<TileScript>().open_down)
+                {
+                    open_up = true;
+                    ChangeTile();
                 }
             }
 
             if (adjacent_tiles[3])
             {
-                if (adjacent_tiles[3].tag == "RoomTileWall")
+                if (adjacent_tiles[3].GetComponent<TileScript>().open_right)
                 {
-                    Sprite adjacent_sprite = adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite;
-
-                    if ((adjacent_sprite == door_left) || (adjacent_sprite == room_left) || (adjacent_sprite == room_blank))
-                    {
-                        if (!timer_on)
-                        {
-                            timer_on = true;
-                        }
-
-                        if (delay_timer > delay_threshold)
-                        {
-                            sprite_rend.sprite = room_blank;
-                            gameObject.tag = "RoomTileWall";
-                            room_tile_already_set = true;
-                            tile_already_set = true;
-                        }
-                    }
-
-                    if ((adjacent_sprite == door_bottom) || (adjacent_sprite == room_bottom) || (adjacent_sprite == room_bottom_left))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_bottom;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_bottom_right;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
-
-                    if ((adjacent_sprite == door_top) || (adjacent_sprite == room_top) || (adjacent_sprite == room_top_left))
-                    {
-                        int tile_rand = Random.Range(0, room_complexity);
-
-                        if (tile_rand <= room_complexity - 2)
-                        {
-                            sprite_rend.sprite = room_top;
-                        }
-
-                        else if (tile_rand == room_complexity - 1)
-                        {
-                            sprite_rend.sprite = room_top_right;
-                        }
-
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-                        tile_already_set = true;
-                    }
+                    open_left = true;
+                    ChangeTile();
                 }
             }
         }
     }
 
-    void ChangeTile()
+    void ChangeRoomTile()
+    {
+        timer_on = true;
+
+        if (timer_on)
+        {
+            delay_timer += Time.deltaTime;
+        }
+
+        if (delay_timer > delay_threshold)
+        {
+            timer_on = false;
+            delay_timer = 0.0f;
+
+            int room_complexity = 10;
+
+            if (adjacent_tiles[0])
+            {
+                TileScript adjacent_room_tile = adjacent_tiles[0].GetComponent<TileScript>();
+
+                if (!adjacent_room_tile.room_tile_already_set)
+                {
+                    int tile_rand = Random.Range(0, room_complexity);
+
+                    adjacent_room_tile.open_down = false;
+                    adjacent_room_tile.open_left = false;
+                    adjacent_room_tile.open_right = false;
+                    adjacent_room_tile.open_up = false;
+
+                    if (tile_rand <= room_complexity - 2)
+                    {
+                        adjacent_room_tile.sprite_rend.sprite = room_bottom;
+                    }
+
+                    else if (tile_rand == room_complexity - 1)
+                    {
+                        if (adjacent_room_tile.adjacent_tiles[0])
+                        {
+                            if (adjacent_room_tile.adjacent_tiles[0].tag == "Tile")
+                            {
+                                adjacent_room_tile.sprite_rend.sprite = door_bottom;
+
+                                adjacent_room_tile.open_down = true;
+                            }
+                        }
+
+                        else
+                        {
+                            adjacent_room_tile.sprite_rend.sprite = room_bottom;
+                        }
+                    }
+
+                    adjacent_room_tile.tile_already_set = true;
+                    adjacent_room_tile.room_tile_already_set = true;
+                    adjacent_room_tile.gameObject.tag = "RoomTileWall";
+                }
+            }
+
+            if (adjacent_tiles[1])
+            {
+                TileScript adjacent_room_tile = adjacent_tiles[1].GetComponent<TileScript>();
+
+                if (!adjacent_room_tile.room_tile_already_set)
+                {
+                    int tile_rand = Random.Range(0, room_complexity);
+
+                    adjacent_room_tile.open_down = false;
+                    adjacent_room_tile.open_left = false;
+                    adjacent_room_tile.open_right = false;
+                    adjacent_room_tile.open_up = false;
+
+                    if (tile_rand <= room_complexity - 2)
+                    {
+                        adjacent_room_tile.sprite_rend.sprite = room_right;
+                    }
+
+                    else if (tile_rand == room_complexity - 1)
+                    {
+                        if (adjacent_room_tile.adjacent_tiles[1])
+                        {
+                            if (adjacent_room_tile.adjacent_tiles[1].tag == "Tile")
+                            {
+                                adjacent_room_tile.sprite_rend.sprite = door_right;
+
+                                adjacent_room_tile.open_right = true;
+                            }
+                        }
+
+                        else
+                        {
+                            adjacent_room_tile.sprite_rend.sprite = room_right;
+                        }
+                    }
+
+                    adjacent_room_tile.tile_already_set = true;
+                    adjacent_room_tile.room_tile_already_set = true;
+                    adjacent_room_tile.gameObject.tag = "RoomTileWall";
+                }
+            }
+
+            if (adjacent_tiles[2])
+            {
+                TileScript adjacent_room_tile = adjacent_tiles[2].GetComponent<TileScript>();
+
+                if (!adjacent_room_tile.room_tile_already_set)
+                {
+                    int tile_rand = Random.Range(0, room_complexity);
+
+                    adjacent_room_tile.open_down = false;
+                    adjacent_room_tile.open_left = false;
+                    adjacent_room_tile.open_right = false;
+                    adjacent_room_tile.open_up = false;
+
+                    if (tile_rand <= room_complexity - 2)
+                    {
+                        adjacent_room_tile.sprite_rend.sprite = room_top;
+                    }
+
+                    else if (tile_rand == room_complexity - 1)
+                    {
+                        if (adjacent_room_tile.adjacent_tiles[2])
+                        {
+                            if (adjacent_room_tile.adjacent_tiles[2].tag == "Tile")
+                            {
+                                adjacent_room_tile.sprite_rend.sprite = door_top;
+
+                                adjacent_room_tile.open_up = true;
+                            }
+                        }
+
+                        else
+                        {
+                            adjacent_room_tile.sprite_rend.sprite = room_top;
+                        }
+                    }
+
+                    adjacent_room_tile.tile_already_set = true;
+                    adjacent_room_tile.room_tile_already_set = true;
+                    adjacent_room_tile.gameObject.tag = "RoomTileWall";
+                }
+            }
+
+            if (adjacent_tiles[3])
+            {
+                TileScript adjacent_room_tile = adjacent_tiles[3].GetComponent<TileScript>();
+
+                if (!adjacent_room_tile.room_tile_already_set)
+                {
+                    int tile_rand = Random.Range(0, room_complexity);
+
+                    adjacent_room_tile.open_down = false;
+                    adjacent_room_tile.open_left = false;
+                    adjacent_room_tile.open_right = false;
+                    adjacent_room_tile.open_up = false;
+
+                    if (tile_rand <= room_complexity - 2)
+                    {
+                        adjacent_room_tile.sprite_rend.sprite = room_left;
+                    }
+
+                    else if (tile_rand == room_complexity - 1)
+                    {
+                        if (adjacent_room_tile.adjacent_tiles[3])
+                        {
+                            if (adjacent_room_tile.adjacent_tiles[3].tag == "Tile")
+                            {
+                                adjacent_room_tile.sprite_rend.sprite = door_left;
+
+                                adjacent_room_tile.open_left = true;
+                            }
+                        }
+
+                        else
+                        {
+                            adjacent_room_tile.sprite_rend.sprite = room_left;
+                        }
+                    }
+
+                    adjacent_room_tile.tile_already_set = true;
+                    adjacent_room_tile.room_tile_already_set = true;
+                    adjacent_room_tile.gameObject.tag = "RoomTileWall";
+                }
+            }
+        }
+    }
+
+    void EdgeCases()
     {
         if ((open_down) && (open_left) && (open_right) && (open_up) && (sprite_rend.sprite != junction))
         {
@@ -477,210 +409,465 @@ public class TileScript : MonoBehaviour {
             sprite_rend.sprite = vertical_gap_left;
         }
 
-        if (!tile_already_set)
+
+        if (gameObject.tag == "RoomTileWall")
         {
-            if (open_down)
+            if (sprite_rend.sprite == door_bottom)
             {
-                int tile_rand = Random.Range(0, difficulty);
-
-                if (tile_rand <= difficulty - 5)
+                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
                 {
-                    sprite_rend.sprite = vertical;
-                    open_up = true;
+                    sprite_rend.sprite = room_blank;
+                    gameObject.tag = "RoomTile";
                 }
 
-                if (tile_rand == difficulty - 4)
+                if (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_top)
                 {
-                    if (spawn_rooms)
-                    {
-                        sprite_rend.sprite = door_bottom;
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-
-                        map_creator.SpawnRoom(this.gameObject);
-                    }
-                    else
-                    {
-                        ChangeTile();
-                        return;
-                    }
+                    sprite_rend.sprite = room_bottom;
                 }
-
-                if (tile_rand == difficulty - 3)
-                {
-                    sprite_rend.sprite = vertical_gap_left;
-                    open_left = true;
-                    open_up = true;
-                }
-
-                if (tile_rand == difficulty - 2)
-                {
-                    sprite_rend.sprite = top_left;
-                    open_right = true;
-                }
-
-                if (tile_rand == difficulty - 1)
-                {
-                    sprite_rend.sprite = vertical_gap_right;
-                    open_right = true;
-                    open_up = true;
-                }
-
-                tile_already_set = true;
             }
 
-            else if (open_up)
+            if (sprite_rend.sprite == door_left)
             {
-                int tile_rand = Random.Range(0, difficulty);
-
-                if (tile_rand <= difficulty - 5)
+                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
                 {
-                    sprite_rend.sprite = vertical;
-                    open_down = true;
+                    sprite_rend.sprite = room_blank;
+                    gameObject.tag = "RoomTile";
                 }
 
-                if (tile_rand == difficulty - 4)
+                if (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_right)
                 {
-                    if (spawn_rooms)
-                    { 
-                        sprite_rend.sprite = door_top;
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-
-                        map_creator.SpawnRoom(this.gameObject);
-                    }
-
-                    else
-                    {
-                        ChangeTile();
-                        return;
-                    }
+                    sprite_rend.sprite = room_left;
                 }
-
-                if (tile_rand == difficulty - 3)
-                {
-                    sprite_rend.sprite = vertical_gap_left;
-                    open_left = true;
-                    open_down = true;
-                }
-
-                if (tile_rand == difficulty - 2)
-                {
-                    sprite_rend.sprite = bottom_left;
-                    open_right = true;
-                }
-
-                if (tile_rand == difficulty - 1)
-                {
-                    sprite_rend.sprite = vertical_gap_right;
-                    open_right = true;
-                    open_down = true;
-                }
-
-                tile_already_set = true;
             }
 
-            else if (open_left)
+            if (sprite_rend.sprite == door_right)
             {
-                int tile_rand = Random.Range(0, difficulty);
-
-                if (tile_rand <= difficulty - 5)
+                if ((adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
                 {
-                    sprite_rend.sprite = horizontal;
-                    open_right = true;
+                    sprite_rend.sprite = room_blank;
+                    gameObject.tag = "RoomTile";
                 }
 
-                if (tile_rand == difficulty - 4)
+                if (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_left)
                 {
-                    if (spawn_rooms)
-                    {
-                        sprite_rend.sprite = door_left;
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
-
-                        map_creator.SpawnRoom(this.gameObject);
-                    }
-
-                    else
-                    {
-                        ChangeTile();
-                        return;
-                    }
+                    sprite_rend.sprite = room_right;
                 }
-
-                if (tile_rand == difficulty - 3)
-                {
-                    sprite_rend.sprite = horizontal_gap_bottom;
-                    open_down = true;
-                    open_right = true;
-                }
-
-                if (tile_rand == difficulty - 2)
-                {
-                    sprite_rend.sprite = bottom_right;
-                    open_up = true;
-                }
-
-                if (tile_rand == difficulty - 1)
-                {
-                    sprite_rend.sprite = horizontal_gap_top;
-                    open_up = true;
-                    open_right = true;
-                }
-
-                tile_already_set = true;
             }
 
-            else if (open_right)
+            if (sprite_rend.sprite == door_top)
             {
-                int tile_rand = Random.Range(0, difficulty);
-
-                if (tile_rand <= difficulty - 5)
+                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
+                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
                 {
-                    sprite_rend.sprite = horizontal;
-                    open_left = true;
+                    sprite_rend.sprite = room_blank;
+                    gameObject.tag = "RoomTile";
                 }
 
-                if (tile_rand == difficulty - 4)
+                if (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_bottom)
                 {
-                    if (spawn_rooms)
-                    {
-                        sprite_rend.sprite = door_right;
-                        gameObject.tag = "RoomTileWall";
-                        room_tile_already_set = true;
+                    sprite_rend.sprite = room_top;
+                }
+            }
 
-                        map_creator.SpawnRoom(this.gameObject);
-                    }
-
-                    else
+            if ((sprite_rend.sprite == room_right) || (sprite_rend.sprite == door_right))
+            {
+                if (adjacent_tiles[0])
+                {
+                    if (adjacent_tiles[0].tag == "Tile")
                     {
-                        ChangeTile();
-                        return;
+                        adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite = room_bottom_right;
                     }
                 }
 
-                if (tile_rand == difficulty - 3)
+                if (adjacent_tiles[2])
                 {
-                    sprite_rend.sprite = horizontal_gap_bottom;
-                    open_down = true;
-                    open_left = true;
+                    if (adjacent_tiles[2].tag == "Tile")
+                    {
+                        adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite = room_top_right;
+                    }
+                }
+            }
+
+            else if ((sprite_rend.sprite == room_left) || (sprite_rend.sprite == door_left))
+            {
+                if (adjacent_tiles[0])
+                {
+                    if (adjacent_tiles[0].tag == "Tile")
+                    {
+                        adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite = room_bottom_left;
+                    }
                 }
 
-                if (tile_rand == difficulty - 2)
+                if (adjacent_tiles[2])
                 {
-                    sprite_rend.sprite = bottom_left;
-                    open_up = true;
+                    if (adjacent_tiles[2].tag == "Tile")
+                    {
+                        adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite = room_top_left;
+                    }
+                }
+            }
+
+            if ((sprite_rend.sprite == room_left) || (sprite_rend.sprite == room_right) || (sprite_rend.sprite == room_top_left) || (sprite_rend.sprite == room_bottom_left)
+                || (sprite_rend.sprite == room_top_right) || (sprite_rend.sprite == room_bottom_right))
+            {
+                if (adjacent_tiles[0])
+                {
+                    if ((adjacent_tiles[0].tag == "RoomTile") || 
+                        (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_top) ||
+                            (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_bottom))
+                            {
+                                sprite_rend.sprite = room_blank;
+                                gameObject.tag = "RoomTile";
+                            }
                 }
 
-                if (tile_rand == difficulty - 1)
+                if (adjacent_tiles[2])
                 {
-                    sprite_rend.sprite = horizontal_gap_top;
-                    open_up = true;
-                    open_left = true;
+                    if ((adjacent_tiles[2].tag == "RoomTile") || 
+                        (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_top) ||
+                            (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_bottom))
+                            {
+                                sprite_rend.sprite = room_blank;
+                                gameObject.tag = "RoomTile";
+                            }
+                }
+            }
+
+            if ((sprite_rend.sprite == room_top) || (sprite_rend.sprite == room_bottom))
+            {
+                if (adjacent_tiles[1])
+                {
+                    if ((adjacent_tiles[1].tag == "RoomTile") || 
+                        (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_left) ||
+                            (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_right))
+                            {
+                                sprite_rend.sprite = room_blank;
+                                gameObject.tag = "RoomTile";
+                            }
                 }
 
-                tile_already_set = true;
-            }                       
+                if (adjacent_tiles[3])
+                {
+                    if ((adjacent_tiles[3].tag == "RoomTile") || 
+                        (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_left) ||
+                            (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_right))
+                            {
+                                sprite_rend.sprite = room_blank;
+                                gameObject.tag = "RoomTile";
+                            }       
+                }
+            }
+
+            if (sprite_rend.sprite == room_top)
+            {
+                if (adjacent_tiles[3])
+                {
+                    if (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_bottom)
+                    {
+                        sprite_rend.sprite = room_top_left;
+                    }
+                }
+
+                if (adjacent_tiles[1])
+                {
+                    if (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_bottom)
+                    {
+                        sprite_rend.sprite = room_top_right;
+                    }
+                }
+            }
+
+            if (sprite_rend.sprite == room_bottom)
+            {
+                if (adjacent_tiles[3])
+                {
+                    if (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_top)
+                    {
+                        sprite_rend.sprite = room_bottom_left;
+                    }
+                }
+
+                if (adjacent_tiles[1])
+                {
+                    if (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_top)
+                    {
+                        sprite_rend.sprite = room_bottom_right;
+                    }
+                }
+            }
+
+            if (sprite_rend.sprite == room_left)
+            {
+                if (adjacent_tiles[2])
+                {
+                    if (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_right)
+                    {
+                        sprite_rend.sprite = room_top_left;
+                    }
+                }
+
+                if (adjacent_tiles[0])
+                {
+                    if (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_right)
+                    {
+                        sprite_rend.sprite = room_bottom_left;
+                    }
+                }
+            }
+
+            if (sprite_rend.sprite == room_right)
+            {
+                if (adjacent_tiles[0])
+                {
+                    if (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_top)
+                    {
+                        sprite_rend.sprite = room_bottom_right;
+                    }
+                }
+
+                if (adjacent_tiles[2])
+                {
+                    if (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_top)
+                    {
+                        sprite_rend.sprite = room_top_right;
+                    }
+                }
+            }
+        }
+    }
+
+    void ChangeTile()
+    {
+        timer_on = true;
+
+        if (timer_on)
+        {
+            delay_timer += Time.deltaTime;
+        }
+
+        if (delay_timer > delay_threshold)
+        {
+            timer_on = false;
+            delay_timer = 0.0f;
+
+            if (!tile_already_set)
+            {
+                if (open_down)
+                {
+                    int tile_rand = Random.Range(0, difficulty);
+
+                    if (tile_rand <= difficulty - 5)
+                    {
+                        sprite_rend.sprite = vertical;
+                        open_up = true;
+                    }
+
+                    if (tile_rand == difficulty - 4)
+                    {
+                        if (spawn_rooms)
+                        {       
+                            if (!map_creator.SpawnRoom(this.gameObject))
+                            {
+                                ChangeTile();
+                                return;
+                            }
+
+                            sprite_rend.sprite = door_bottom;
+                            gameObject.tag = "RoomTileWall";
+                            room_tile_already_set = true;
+                        }
+                        else
+                        {
+                            ChangeTile();
+                            return;
+                        }
+                    }
+
+                    if (tile_rand == difficulty - 3)
+                    {
+                        sprite_rend.sprite = vertical_gap_left;
+                        open_left = true;
+                        open_up = true;
+                    }
+
+                    if (tile_rand == difficulty - 2)
+                    {
+                        sprite_rend.sprite = top_left;
+                        open_right = true;
+                    }
+
+                    if (tile_rand == difficulty - 1)
+                    {
+                        sprite_rend.sprite = vertical_gap_right;
+                        open_right = true;
+                        open_up = true;
+                    }
+
+                    tile_already_set = true;
+                }
+
+                else if (open_up)
+                {
+                    int tile_rand = Random.Range(0, difficulty);
+
+                    if (tile_rand <= difficulty - 5)
+                    {
+                        sprite_rend.sprite = vertical;
+                        open_down = true;
+                    }
+
+                    if (tile_rand == difficulty - 4)
+                    {
+                        //if (spawn_rooms)
+                        //{ 
+                        //    sprite_rend.sprite = door_top;
+                        //    gameObject.tag = "RoomTileWall";
+                        //    room_tile_already_set = true;
+
+                        //    map_creator.SpawnRoom(this.gameObject);
+                        //}
+
+                        //else
+                        {
+                            ChangeTile();
+                            return;
+                        }
+                    }
+
+                    if (tile_rand == difficulty - 3)
+                    {
+                        sprite_rend.sprite = vertical_gap_left;
+                        open_left = true;
+                        open_down = true;
+                    }
+
+                    if (tile_rand == difficulty - 2)
+                    {
+                        sprite_rend.sprite = bottom_left;
+                        open_right = true;
+                    }
+
+                    if (tile_rand == difficulty - 1)
+                    {
+                        sprite_rend.sprite = vertical_gap_right;
+                        open_right = true;
+                        open_down = true;
+                    }
+
+                    tile_already_set = true;
+                }
+
+                else if (open_left)
+                {
+                    int tile_rand = Random.Range(0, difficulty);
+
+                    if (tile_rand <= difficulty - 5)
+                    {
+                        sprite_rend.sprite = horizontal;
+                        open_right = true;
+                    }
+
+                    if (tile_rand == difficulty - 4)
+                    {
+                        //if (spawn_rooms)
+                        //{
+                        //    sprite_rend.sprite = door_left;
+                        //    gameObject.tag = "RoomTileWall";
+                        //    room_tile_already_set = true;
+
+                        //    map_creator.SpawnRoom(this.gameObject);
+                        //}
+
+                        //else
+                        {
+                            ChangeTile();
+                            return;
+                        }
+                    }
+
+                    if (tile_rand == difficulty - 3)
+                    {
+                        sprite_rend.sprite = horizontal_gap_bottom;
+                        open_down = true;
+                        open_right = true;
+                    }
+
+                    if (tile_rand == difficulty - 2)
+                    {
+                        sprite_rend.sprite = bottom_right;
+                        open_up = true;
+                    }
+
+                    if (tile_rand == difficulty - 1)
+                    {
+                        sprite_rend.sprite = horizontal_gap_top;
+                        open_up = true;
+                        open_right = true;
+                    }
+
+                    tile_already_set = true;
+                }
+
+                else if (open_right)
+                {
+                    int tile_rand = Random.Range(0, difficulty);
+
+                    if (tile_rand <= difficulty - 5)
+                    {
+                        sprite_rend.sprite = horizontal;
+                        open_left = true;
+                    }
+
+                    if (tile_rand == difficulty - 4)
+                    {
+                        //if (spawn_rooms)
+                        //{
+                        //    sprite_rend.sprite = door_right;
+                        //    gameObject.tag = "RoomTileWall";
+                        //    room_tile_already_set = true;
+
+                        //    map_creator.SpawnRoom(this.gameObject);
+                        //}
+
+                        //else
+                        {
+                            ChangeTile();
+                            return;
+                        }
+                    }
+
+                    if (tile_rand == difficulty - 3)
+                    {
+                        sprite_rend.sprite = horizontal_gap_bottom;
+                        open_down = true;
+                        open_left = true;
+                    }
+
+                    if (tile_rand == difficulty - 2)
+                    {
+                        sprite_rend.sprite = bottom_left;
+                        open_up = true;
+                    }
+
+                    if (tile_rand == difficulty - 1)
+                    {
+                        sprite_rend.sprite = horizontal_gap_top;
+                        open_up = true;
+                        open_left = true;
+                    }
+
+                    tile_already_set = true;
+                }
+            }
         }
     }
 }
+
+
