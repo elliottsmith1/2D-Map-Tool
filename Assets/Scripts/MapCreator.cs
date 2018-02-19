@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public enum Difficulty
@@ -12,6 +13,7 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] bool spawn_grid = false;
 
     [SerializeField] int grid_size = 10;
+    public Slider size_slider;
 
     private int grid_height = 10;
     private int grid_width = 10;
@@ -20,6 +22,9 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] int tiles_required = 0;
     [SerializeField] int rooms = 0;
     [SerializeField] int rooms_required = 3;
+    public Slider rooms_slider;
+    public Text room_text;
+    public Text tiles_text;
     private float tile_timer = 0.0f;
     private float tile_timer_threshold = 1.0f;
 
@@ -61,6 +66,9 @@ public class MapCreator : MonoBehaviour {
         }
 
         SpawnGrid();
+
+        room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+        tiles_text.text = "Tiles: " + tile_total.ToString() + " / " + (tiles.Length / 5).ToString();
     }
 	
 	// Update is called once per frame
@@ -68,7 +76,39 @@ public class MapCreator : MonoBehaviour {
 
         tile_timer += Time.deltaTime;
 
-        if ((spawn_grid) || ((tile_timer > tile_timer_threshold) && ((tile_total < (tiles.Length / 4)) || (rooms < rooms_required))))
+        if (grid_size != size_slider.value)
+        {
+            grid_size = (int)size_slider.value;
+        }
+
+        if (rooms_required != rooms_slider.value)
+        {
+            rooms_required = (int)rooms_slider.value;
+            room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+
+            if (rooms_required == 0)
+            {
+                if (spawn_rooms)
+                {
+                    spawn_rooms = false;
+                }
+
+                if (room_text.color != Color.green)
+                {
+                    room_text.color = Color.green;
+                }
+            }
+
+            else
+            {
+                if (!spawn_rooms)
+                {
+                    spawn_rooms = true;
+                }
+            }
+        }
+
+        if ((spawn_grid) || ((tile_timer > tile_timer_threshold) && ((tile_total < (tiles.Length / 5)) || (rooms < rooms_required))))
         {
             ResetGrid();            
 
@@ -133,6 +173,14 @@ public class MapCreator : MonoBehaviour {
         tile_total = 0;
         rooms = 0;
         room_stats.Clear();
+        room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+
+        if (spawn_rooms)
+        {
+            room_text.color = Color.red;
+        }
+
+        tiles_text.color = Color.red;
 
         switch (difficulty)
         {
@@ -189,6 +237,24 @@ public class MapCreator : MonoBehaviour {
         tile_total++;
 
         tile_timer = 0.0f;
+
+        tiles_text.text = "Tiles: " + tile_total.ToString() + " / " + (tiles.Length / 5).ToString();
+
+        if (tile_total >= tiles_required)
+        {
+            if (tiles_text.color != Color.green)
+            {
+                tiles_text.color = Color.green;
+            }
+        }
+
+        else 
+        {
+            if (tiles_text.color != Color.red)
+            {
+                tiles_text.color = Color.red;
+            }
+        }
     }
 
     public bool SpawnRoom(GameObject _door)
@@ -220,9 +286,12 @@ public class MapCreator : MonoBehaviour {
                     {
                         room_floor_tiles[j + (room_height * i)] = room_floor_tiles[j + (room_height * (i - 1))].GetComponent<TileScript>().adjacent_tiles[1];
 
-                        if (room_floor_tiles[j + (room_height * i)].tag != "Tile")
+                        if (room_floor_tiles[j + (room_height * i)])
                         {
-                            return false;
+                            if (room_floor_tiles[j + (room_height * i)].tag != "Tile")
+                            {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -233,6 +302,24 @@ public class MapCreator : MonoBehaviour {
             room.id = room_id_num;
             room_stats.Add(room);
             rooms++;
+
+            if (rooms >= rooms_required)
+            {
+                if (room_text.color != Color.green)
+                {
+                    room_text.color = Color.green;
+                }
+            }
+
+            else
+            {
+                if (room_text.color != Color.red)
+                {
+                    room_text.color = Color.red;
+                }
+            }
+
+            room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
 
             for (int i = 0; i < room_floor_tiles.Length; i++)
             {
