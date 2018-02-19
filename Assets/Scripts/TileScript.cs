@@ -17,10 +17,12 @@ public class TileScript : MonoBehaviour {
 
     public SpriteRenderer sprite_rend;
     private int difficulty;
+    public int room_id;
     private float delay_timer = 0.0f;
     private float delay_threshold = 0.075f;
     private bool timer_on = false;
     private bool spawn_rooms = false;
+    private bool updated_map_creator = false;
 
     private MapCreator map_creator;
 
@@ -77,6 +79,12 @@ public class TileScript : MonoBehaviour {
         SetTile();
         EdgeCases();
 
+        if ((sprite_rend.sprite != blank) && (!updated_map_creator))
+        {
+            updated_map_creator = true;
+            map_creator.AddTile();
+        }
+
         if (timer_on)
         {
             delay_timer += Time.deltaTime;
@@ -101,6 +109,8 @@ public class TileScript : MonoBehaviour {
         open_up = false;
         tile_already_set = false;
         room_tile_already_set = false;
+        updated_map_creator = false;
+        delay_timer = 0.0f;
         gameObject.tag = "Tile";
     }
 
@@ -235,9 +245,19 @@ public class TileScript : MonoBehaviour {
                         {
                             if (adjacent_room_tile.adjacent_tiles[0].tag == "Tile")
                             {
-                                adjacent_room_tile.sprite_rend.sprite = door_bottom;
+                                if (!map_creator.room_stats[room_id].door_bottom)
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = door_bottom;
 
-                                adjacent_room_tile.open_down = true;
+                                    adjacent_room_tile.open_down = true;
+
+                                    map_creator.room_stats[room_id].door_bottom = true;
+                                }
+
+                                else
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = room_bottom;
+                                }
                             }
                         }
 
@@ -277,9 +297,19 @@ public class TileScript : MonoBehaviour {
                         {
                             if (adjacent_room_tile.adjacent_tiles[1].tag == "Tile")
                             {
-                                adjacent_room_tile.sprite_rend.sprite = door_right;
+                                if (!map_creator.room_stats[room_id].door_right)
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = door_right;
 
-                                adjacent_room_tile.open_right = true;
+                                    adjacent_room_tile.open_right = true;
+
+                                    map_creator.room_stats[room_id].door_right = true;
+                                }
+
+                                else
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = room_right;
+                                }
                             }
                         }
 
@@ -319,9 +349,19 @@ public class TileScript : MonoBehaviour {
                         {
                             if (adjacent_room_tile.adjacent_tiles[2].tag == "Tile")
                             {
-                                adjacent_room_tile.sprite_rend.sprite = door_top;
+                                if (!map_creator.room_stats[room_id].door_top)
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = door_top;
 
-                                adjacent_room_tile.open_up = true;
+                                    adjacent_room_tile.open_up = true;
+
+                                    map_creator.room_stats[room_id].door_top = true;
+                                }
+
+                                else
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = room_top;
+                                }
                             }
                         }
 
@@ -361,9 +401,19 @@ public class TileScript : MonoBehaviour {
                         {
                             if (adjacent_room_tile.adjacent_tiles[3].tag == "Tile")
                             {
-                                adjacent_room_tile.sprite_rend.sprite = door_left;
+                                if (!map_creator.room_stats[room_id].door_left)
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = door_left;
 
-                                adjacent_room_tile.open_left = true;
+                                    adjacent_room_tile.open_left = true;
+
+                                    map_creator.room_stats[room_id].door_left = true;
+                                }
+
+                                else
+                                {
+                                    adjacent_room_tile.sprite_rend.sprite = room_left;
+                                }
                             }
                         }
 
@@ -408,7 +458,12 @@ public class TileScript : MonoBehaviour {
         {
             sprite_rend.sprite = vertical_gap_left;
         }
-
+    
+        if (((tile_already_set) || (room_tile_already_set)) && (sprite_rend.sprite == blank))
+        {
+            tile_already_set = false;
+            room_tile_already_set = false;
+        }
 
         if (gameObject.tag == "RoomTileWall")
         {

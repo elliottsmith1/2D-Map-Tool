@@ -12,11 +12,21 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] bool spawn_grid = false;
 
     [SerializeField] int grid_size = 10;
+
     private int grid_height = 10;
     private int grid_width = 10;
+
+    [SerializeField] int tile_total = 0;
+    [SerializeField] int tiles_required = 0;
+    [SerializeField] int rooms = 0;
+    [SerializeField] int rooms_required = 3;
+    private float tile_timer = 0.0f;
+    private float tile_timer_threshold = 1.0f;
+
     [SerializeField] Vector3[] tile_positions;
     [SerializeField] GameObject tile_prefab;
     [SerializeField] GameObject[] tiles;
+    public List<Room> room_stats;
 
     [SerializeField] Sprite junction;
     [SerializeField] Sprite blank;
@@ -54,9 +64,11 @@ public class MapCreator : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {        
+	void Update () {
 
-        if (spawn_grid)
+        tile_timer += Time.deltaTime;
+
+        if ((spawn_grid) || ((tile_timer > tile_timer_threshold) && ((tile_total < (tiles.Length / 4)) || (rooms < rooms_required))))
         {
             ResetGrid();            
 
@@ -70,7 +82,8 @@ public class MapCreator : MonoBehaviour {
         grid_width = grid_size;
 
         tile_positions = new Vector3[grid_height * grid_width];
-        tiles = new GameObject[tile_positions.Length];        
+        tiles = new GameObject[tile_positions.Length];
+        tiles_required = tiles.Length / 5;
 
         float width = 0;
         float height = 0;
@@ -114,8 +127,13 @@ public class MapCreator : MonoBehaviour {
         tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;        
     }
 
-    void ResetGrid()
+    public void ResetGrid()
     {
+        tile_timer = 0.0f;
+        tile_total = 0;
+        rooms = 0;
+        room_stats.Clear();
+
         switch (difficulty)
         {
             case Difficulty.easy:
@@ -146,14 +164,14 @@ public class MapCreator : MonoBehaviour {
             SpawnGrid();
         }
 
+        tiles_required = tiles.Length / 5;
+
         for (int i = 0; i < tiles.Length; i++)
         {
             tiles[i].GetComponent<SpriteRenderer>().sprite = blank;
             tiles[i].GetComponent<TileScript>().ResetTile();
             tiles[i].GetComponent<TileScript>().SetDifficulty(difficulty_num);
-            tiles[i].GetComponent<TileScript>().tile_already_set = false;
             tiles[i].GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
-
         }
 
         int tile_rand = Random.Range(0, tiles.Length);
@@ -164,6 +182,13 @@ public class MapCreator : MonoBehaviour {
         tiles[tile_rand].GetComponent<TileScript>().open_down = true;
 
         tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
+    }
+
+    public void AddTile()
+    {
+        tile_total++;
+
+        tile_timer = 0.0f;
     }
 
     public bool SpawnRoom(GameObject _door)
@@ -203,6 +228,12 @@ public class MapCreator : MonoBehaviour {
                 }
             }
 
+            int room_id_num = room_stats.Count;
+            Room room = new Room();
+            room.id = room_id_num;
+            room_stats.Add(room);
+            rooms++;
+
             for (int i = 0; i < room_floor_tiles.Length; i++)
             {
                 if (room_floor_tiles[i])
@@ -218,12 +249,10 @@ public class MapCreator : MonoBehaviour {
                     floor_tile.gameObject.tag = "RoomTile";
                     floor_tile.room_tile_already_set = true;
                     floor_tile.tile_already_set = true;
-
-
+                    floor_tile.room_id = room_id_num;
                 }
             }
-        }
-
+        }        
         return true;
     }
 }
