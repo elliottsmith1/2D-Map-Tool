@@ -10,6 +10,9 @@ public enum Difficulty
 
 public class MapCreator : MonoBehaviour {
 
+    [SerializeField] MapData map_data;
+    private bool map_set = false;
+
     [SerializeField] bool spawn_grid = false;
 
     [SerializeField] int grid_size = 10;
@@ -26,7 +29,7 @@ public class MapCreator : MonoBehaviour {
     public Text room_text;
     public Text tiles_text;
     private float tile_timer = 0.0f;
-    private float tile_timer_threshold = 1.0f;
+    private float tile_timer_threshold = 0.5f;
 
     [SerializeField] Vector3[] tile_positions;
     [SerializeField] GameObject tile_prefab;
@@ -113,13 +116,68 @@ public class MapCreator : MonoBehaviour {
             ResetGrid();            
 
             spawn_grid = false;
+            map_set = false;
         }
+
+        if (tile_timer > tile_timer_threshold)
+        {
+            if (!map_set)
+            {
+                UpdateMapState();
+            }
+        }
+    }
+
+    public void LoadMap()
+    {
+        map_set = true;
+
+        grid_size = map_data.grid_size;
+        size_slider.value = grid_size;   
+
+        ResetGrid();
+
+        rooms = map_data.rooms;
+        rooms_slider.value = rooms;
+
+        room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+
+        if (rooms >= rooms_required)
+        {
+            if (room_text.color != Color.green)
+            {
+                room_text.color = Color.green;
+            }
+        }
+
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            tiles[i].GetComponent<TileScript>().tile_type = map_data.map[i];
+            tiles[i].GetComponent<TileScript>().LoadTile();
+        }
+    }
+
+    void UpdateMapState()
+    {
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            tiles[i].GetComponent<TileScript>().SetType();
+
+            map_data.map[i] = tiles[i].GetComponent<TileScript>().tile_type;
+        }
+
+        map_data.rooms = rooms;
+        map_data.grid_size = grid_size;
+
+        map_set = true;
     }
 
     void SpawnGrid()
     {
         grid_height = grid_size;
         grid_width = grid_size;
+
+        map_data.map = new int[grid_size * grid_size];
 
         tile_positions = new Vector3[grid_height * grid_width];
         tiles = new GameObject[tile_positions.Length];
@@ -157,14 +215,17 @@ public class MapCreator : MonoBehaviour {
             tiles[i] = Instantiate(tile, position, Quaternion.identity);
         }
 
-        int tile_rand = Random.Range(0, tiles.Length);
+        if (!map_set)
+        {
+            int tile_rand = Random.Range(0, tiles.Length);
 
-        tiles[tile_rand].GetComponent<TileScript>().open_right = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_up = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_left = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_down = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_right = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_up = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_left = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_down = true;
 
-        tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;        
+            tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
+        }       
     }
 
     public void ResetGrid()
@@ -222,14 +283,17 @@ public class MapCreator : MonoBehaviour {
             tiles[i].GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
         }
 
-        int tile_rand = Random.Range(0, tiles.Length);
+        if (!map_set)
+        {
+            int tile_rand = Random.Range(0, tiles.Length);
 
-        tiles[tile_rand].GetComponent<TileScript>().open_right = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_up = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_left = true;
-        tiles[tile_rand].GetComponent<TileScript>().open_down = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_right = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_up = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_left = true;
+            tiles[tile_rand].GetComponent<TileScript>().open_down = true;
 
-        tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
+            tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
+        }
     }
 
     public void AddTile()

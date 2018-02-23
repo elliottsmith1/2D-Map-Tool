@@ -1,55 +1,97 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-public class FileManagement : MonoBehaviour
+public static class FileManagement 
 {
-    string current_name = "Filename";
-    int[] map_data = new int[2];
-
-    void Start()
+    public static void SaveFile(MapData _map)
     {
-        SaveFile();
-        LoadFile();
-    }
-
-    public void SaveFile()
-    {
-        string destination = Application.persistentDataPath + "/save.dat";
-        FileStream file;
-
-        if (File.Exists(destination)) file = File.OpenWrite(destination);
-        else file = File.Create(destination);
-
-        MapData data = new MapData(current_name, map_data);
         BinaryFormatter bf = new BinaryFormatter();
-        bf.Serialize(file, data);
-        file.Close();
+        FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Create);
+
+        Map data = new Map(_map);
+
+        bf.Serialize(stream, data);
+        stream.Close();
     }
 
-    public void LoadFile()
+    public static int[] LoadMap()
     {
-        string destination = Application.persistentDataPath + "/save.dat";
-        FileStream file;
+        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
 
-        if (File.Exists(destination)) file = File.OpenRead(destination);
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+            return data.map;
+        }
+
         else
         {
             Debug.LogError("File not found");
-            return;
+            return null;
         }
-
-        BinaryFormatter bf = new BinaryFormatter();
-        MapData data = (MapData)bf.Deserialize(file);
-        file.Close();
-
-        current_name = data.name;
-        map_data = data.map;
-
-        Debug.Log(data.name);
-        Debug.Log(data.map);
     }
 
+    public static int LoadMapRooms()
+    {
+        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
+
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+            return data.rooms;
+        }
+
+        else
+        {
+            Debug.LogError("File not found");
+            return 0;
+        }
+    }
+
+    public static int LoadMapSize()
+    {
+        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
+
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+            return data.grid_size;
+        }
+
+        else
+        {
+            Debug.LogError("File not found");
+            return 0;
+        }
+    }
+
+    [Serializable]
+    public class Map
+    {
+        public string name;
+        public int[] map;
+        public int rooms = 0;
+        public int grid_size = 0;
+
+        public Map(MapData _map)
+        {
+            name = _map.name;
+            map = _map.map;
+            rooms = _map.rooms;
+            grid_size = _map.grid_size;
+        }
+    }    
 }

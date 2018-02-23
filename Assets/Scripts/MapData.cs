@@ -1,16 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-[System.Serializable]
 
-public class MapData
+public class MapData : MonoBehaviour
 {
-    public string name;
-    public int[] map;
+    public string name = "map";
+    public int[] map = new int[3];
+    public int rooms = 0;
+    public int grid_size = 0;
 
-    public MapData(string _name, int[] _map)
+    [SerializeField] MapCreator map_creator;
+
+    public void Save()
     {
-        name = _name;
-        map = _map;
+        FileManagement.SaveFile(this);
+    }
+
+    public void Load()
+    {
+        rooms = FileManagement.LoadMapRooms();
+        grid_size = FileManagement.LoadMapSize();
+        map = FileManagement.LoadMap();
+
+        map_creator.LoadMap();
     }
 }

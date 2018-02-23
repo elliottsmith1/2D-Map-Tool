@@ -5,6 +5,7 @@ using UnityEngine;
 public class TileScript : MonoBehaviour {
 
     public int id;
+    public int tile_type;
     public int value;
 
     public bool open_up = false;
@@ -99,6 +100,216 @@ public class TileScript : MonoBehaviour {
     public void SetSpawnRooms(bool _spwn)
     {
         spawn_rooms = _spwn;
+    }
+
+    public void LoadTile()
+    {
+        switch (tile_type)
+        {
+            case 1:
+                sprite_rend.sprite = bottom_left;
+                break;
+            case 2:
+                sprite_rend.sprite = bottom_right;
+                break;
+            case 3:
+                sprite_rend.sprite = top_left;
+                break;
+            case 4:
+                sprite_rend.sprite = top_right;
+                break;
+            case 5:
+                sprite_rend.sprite = door_left;
+                break;
+            case 6:
+                sprite_rend.sprite = door_right;
+                break;
+            case 7:
+                sprite_rend.sprite = door_top;
+                break;
+            case 8:
+                sprite_rend.sprite = door_bottom;
+                break;
+            case 9:
+                sprite_rend.sprite = room_top;
+                break;
+            case 10:
+                sprite_rend.sprite = room_right;
+                break;
+            case 11:
+                sprite_rend.sprite = room_bottom;
+                break;
+            case 12:
+                sprite_rend.sprite = room_left;
+                break;
+            case 13:
+                sprite_rend.sprite = room_top_right;
+                break;
+            case 14:
+                sprite_rend.sprite = room_top_left;
+                break;
+            case 15:
+                sprite_rend.sprite = room_bottom_right;
+                break;
+            case 16:
+                sprite_rend.sprite = room_bottom_left;
+                break;
+            case 17:
+                sprite_rend.sprite = room_blank;
+                break;
+            case 18:
+                sprite_rend.sprite = vertical;
+                break;
+            case 19:
+                sprite_rend.sprite = horizontal;
+                break;
+            case 20:
+                sprite_rend.sprite = vertical_gap_left;
+                break;
+            case 21:
+                sprite_rend.sprite = vertical_gap_right;
+                break;
+            case 22:
+                sprite_rend.sprite = horizontal_gap_top;
+                break;
+            case 23:
+                sprite_rend.sprite = horizontal_gap_bottom;
+                break;
+            case 24:
+                sprite_rend.sprite = junction;
+                break;
+            case 25:
+                sprite_rend.sprite = blank;
+                break;
+        }
+    }
+
+    public void SetType()
+    {
+        if (sprite_rend.sprite == bottom_left)
+        {
+            tile_type = 1;
+        }
+
+        else if (sprite_rend.sprite == bottom_right)
+        {
+            tile_type = 2;
+        }
+
+        else if(sprite_rend.sprite == top_left)
+        {
+            tile_type = 3;
+        }
+
+        else if(sprite_rend.sprite == top_right)
+        {
+            tile_type = 4;
+        }
+
+        else if(sprite_rend.sprite == door_left)
+        {
+            tile_type = 5;
+        }
+
+        else if(sprite_rend.sprite == door_right)
+        {
+            tile_type = 6;
+        }
+
+        else if(sprite_rend.sprite == door_top)
+        {
+            tile_type = 7;
+        }
+
+        else if(sprite_rend.sprite == door_bottom)
+        {
+            tile_type = 8;
+        }
+
+        else if(sprite_rend.sprite == room_top)
+        {
+            tile_type = 9;
+        }
+
+        else if(sprite_rend.sprite == room_right)
+        {
+            tile_type = 10;
+        }
+
+        else if(sprite_rend.sprite == room_bottom)
+        {
+            tile_type = 11;
+        }
+
+        else if(sprite_rend.sprite == room_left)
+        {
+            tile_type = 12;
+        }
+
+        else if(sprite_rend.sprite == room_top_right)
+        {
+            tile_type = 13;
+        }
+
+        else if(sprite_rend.sprite == room_top_left)
+        {
+            tile_type = 14;
+        }
+
+        else if(sprite_rend.sprite == room_bottom_right)
+        {
+            tile_type = 15;
+        }
+
+        else if(sprite_rend.sprite == room_bottom_left)
+        {
+            tile_type = 16;
+        }
+
+        else if(sprite_rend.sprite == room_blank)
+        {
+            tile_type = 17;
+        }
+
+        else if(sprite_rend.sprite == vertical)
+        {
+            tile_type = 18;
+        }
+
+        else if(sprite_rend.sprite == horizontal)
+        {
+            tile_type = 19;
+        }
+
+        else if(sprite_rend.sprite == vertical_gap_left)
+        {
+            tile_type = 20;
+        }
+
+        else if(sprite_rend.sprite == vertical_gap_right)
+        {
+            tile_type = 21;
+        }
+
+        else if(sprite_rend.sprite == horizontal_gap_top)
+        {
+            tile_type = 22;
+        }
+
+        else if(sprite_rend.sprite == horizontal_gap_bottom)
+        {
+            tile_type = 23;
+        }
+
+        else if (sprite_rend.sprite == junction)
+        {
+            tile_type = 24;
+        }
+
+        else if (sprite_rend.sprite == blank)
+        {
+            tile_type = 25;
+        }
     }
 
     public void ResetTile()
