@@ -9,19 +9,35 @@ public class MapData : MonoBehaviour
     public int[] map = new int[3];
     public int rooms = 0;
     public int grid_size = 0;
+    [SerializeField] FilesList files_list;
     [SerializeField] InputField text_input;
     [SerializeField] MapCreator map_creator;
+    [SerializeField] Dropdown files_dropdown;
+
+    void Start()
+    {
+        files_dropdown.ClearOptions();
+        files_dropdown.AddOptions(files_list.file_names);
+    }
 
     public void Save()
     {
+        name = text_input.text;
+
         FileManagement.SaveFile(this, text_input.text);
+
+        files_list.AddFile(text_input.text);
+        files_list.Save();
+        
+        files_dropdown.ClearOptions();
+        files_dropdown.AddOptions(files_list.file_names);
     }
 
     public void Load()
     {
-        rooms = FileManagement.LoadMapRooms(text_input.text);
-        grid_size = FileManagement.LoadMapSize(text_input.text);
-        map = FileManagement.LoadMap(text_input.text);
+        rooms = FileManagement.LoadMapRooms(files_dropdown.captionText.text);
+        grid_size = FileManagement.LoadMapSize(files_dropdown.captionText.text);
+        map = FileManagement.LoadMap(files_dropdown.captionText.text);
 
         map_creator.LoadMap();
     }

@@ -18,9 +18,40 @@ public static class FileManagement
         stream.Close();
     }
 
+    public static void SaveFilesList(FilesList _files)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream stream = new FileStream(Application.persistentDataPath + "/FileList.dat", FileMode.Create);
+
+        Files data = new Files(_files);
+
+        bf.Serialize(stream, data);
+        stream.Close();
+    }
+
+    public static List<string> LoadFilesList()
+    {
+        if (File.Exists(Application.persistentDataPath + "/FileList.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/FileList.dat", FileMode.Open);
+
+            Files data = bf.Deserialize(stream) as Files;
+
+            stream.Close();
+            return data.file_names;
+        }
+
+        else
+        {
+            Debug.LogError("Files list not found");
+            return null;
+        }
+    }
+
     public static int[] LoadMap(String _file_name)
     {
-        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
             FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
@@ -93,5 +124,16 @@ public static class FileManagement
             rooms = _map.rooms;
             grid_size = _map.grid_size;
         }
-    }    
+    }
+
+    [Serializable]
+    public class Files
+    {
+        public List<string> file_names;
+
+        public Files(FilesList _files)
+        {
+            file_names = _files.file_names;
+        }
+    }
 }
