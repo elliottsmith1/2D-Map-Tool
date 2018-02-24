@@ -7,10 +7,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public static class FileManagement 
 {
-    public static void SaveFile(MapData _map)
+    public static void SaveFile(MapData _map, String _file_name)
     {
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Create);
+        FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Create);
 
         Map data = new Map(_map);
 
@@ -18,12 +18,12 @@ public static class FileManagement
         stream.Close();
     }
 
-    public static int[] LoadMap()
+    public static int[] LoadMap(String _file_name)
     {
         if (File.Exists(Application.persistentDataPath + "/map.dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
 
             Map data = bf.Deserialize(stream) as Map;
 
@@ -38,12 +38,12 @@ public static class FileManagement
         }
     }
 
-    public static int LoadMapRooms()
+    public static int LoadMapRooms(String _file_name)
     {
-        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
 
             Map data = bf.Deserialize(stream) as Map;
 
@@ -58,12 +58,12 @@ public static class FileManagement
         }
     }
 
-    public static int LoadMapSize()
+    public static int LoadMapSize(String _file_name)
     {
-        if (File.Exists(Application.persistentDataPath + "/map.dat"))
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream stream = new FileStream(Application.persistentDataPath + "/map.dat", FileMode.Open);
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
 
             Map data = bf.Deserialize(stream) as Map;
 
