@@ -8,7 +8,7 @@ public class FilesList : MonoBehaviour
 
     void Start()
     {
-        Load();
+        file_names = new List<string>();
     }
 
     public void Save()

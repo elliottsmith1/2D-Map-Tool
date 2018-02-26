@@ -16,6 +16,9 @@ public class MapData : MonoBehaviour
 
     void Start()
     {
+        files_list.Load();
+        files_list.Save();
+
         files_dropdown.ClearOptions();
         files_dropdown.AddOptions(files_list.file_names);
     }

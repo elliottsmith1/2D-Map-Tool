@@ -325,6 +325,61 @@ public class TileScript : MonoBehaviour {
         gameObject.tag = "Tile";
     }
 
+    void OnMouseDown()
+    {
+        if (sprite_rend.sprite == blank)
+        {
+            bool tunnel_top = false;
+            bool tunnel_bottom = false;
+            bool tunnel_left = false;
+            bool tunnel_right = false;
+
+            if (adjacent_tiles[2])
+            {
+                if ((adjacent_tiles[2].tag == "Tile") && (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite != blank))
+                {
+                    open_up = true;
+                    tunnel_top = true;
+                }
+            }
+
+            if (adjacent_tiles[0])
+            {
+                if ((adjacent_tiles[0].tag == "Tile") && (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite != blank))
+                {
+                    open_down = true;
+                    tunnel_bottom = true;
+                }
+            }
+
+            if (adjacent_tiles[3])
+            {
+                if ((adjacent_tiles[3].tag == "Tile") && (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite != blank))
+                {
+                    open_left = true;
+                    tunnel_left = true;
+                }
+            }
+
+            if (adjacent_tiles[1])
+            {
+                if ((adjacent_tiles[1].tag == "Tile") && (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite != blank))
+                {
+                    open_right = true;
+                    tunnel_right = true;
+                }
+            }
+
+            if ((!tunnel_bottom) && (!tunnel_left) && (!tunnel_right) && (!tunnel_top))
+            {
+                open_down = true;
+                open_left = true;
+                open_right = true;
+                open_up = true;
+            }
+        }
+    }
+
     void OnTriggerStay2D(Collider2D other)
     {
         //if (other.tag == "Tile")

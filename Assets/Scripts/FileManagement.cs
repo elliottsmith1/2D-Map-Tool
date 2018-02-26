@@ -44,7 +44,7 @@ public static class FileManagement
 
         else
         {
-            Debug.LogError("Files list not found");
+            //files list not found
             return null;
         }
     }
@@ -84,7 +84,7 @@ public static class FileManagement
 
         else
         {
-            Debug.LogError("File not found");
+            //file not found
             return 0;
         }
     }
