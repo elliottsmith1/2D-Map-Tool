@@ -17,7 +17,7 @@ public class MapData : MonoBehaviour
     void Start()
     {
         files_list.Load();
-        files_list.Save();
+        files_list.Save();        
 
         files_dropdown.ClearOptions();
         files_dropdown.AddOptions(files_list.file_names);
@@ -25,15 +25,18 @@ public class MapData : MonoBehaviour
 
     public void Save()
     {
-        name = text_input.text;
+        if (text_input.text != null)
+        {
+            name = text_input.text;
 
-        FileManagement.SaveFile(this, text_input.text);
+            FileManagement.SaveFile(this, text_input.text);
 
-        files_list.AddFile(text_input.text);
-        files_list.Save();
-        
-        files_dropdown.ClearOptions();
-        files_dropdown.AddOptions(files_list.file_names);
+            files_list.AddFile(text_input.text);
+            files_list.Save();
+
+            files_dropdown.ClearOptions();
+            files_dropdown.AddOptions(files_list.file_names);
+        }
     }
 
     public void Load()
