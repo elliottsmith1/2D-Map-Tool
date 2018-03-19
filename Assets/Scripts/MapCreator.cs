@@ -10,44 +10,48 @@ public enum Difficulty
 
 public class MapCreator : MonoBehaviour {
 
-    [SerializeField] MapData map_data;
-    private bool map_set = false;
-
+    [Header("Parameters")]
     [SerializeField] bool spawn_grid = false;
-
     [SerializeField] int grid_size = 10;
-    public Slider size_slider;
-
-    private int grid_height = 10;
-    private int grid_width = 10;
-
     [SerializeField] int tile_total = 0;
     [SerializeField] int tiles_required = 0;
     [SerializeField] int rooms = 0;
     [SerializeField] int rooms_required = 3;
-    public Slider rooms_slider;
-    public Text room_text;
-    public Text tiles_text;
-    private float tile_timer = 0.0f;
-    private float tile_timer_threshold = 0.5f;
+    [SerializeField] bool spawn_rooms = false;
+    [SerializeField] Difficulty difficulty;
 
+    [Header("References")]
+    [SerializeField] MapData map_data;
     [SerializeField] Vector3[] tile_positions;
     [SerializeField] GameObject tile_prefab;
+    [SerializeField] GameObject door_prefab;
     [SerializeField] GameObject[] tiles;
     public List<Room> room_stats;
 
+    [Header("Sprite References")]
     [SerializeField] Sprite junction;
     [SerializeField] Sprite blank;
     [SerializeField] Sprite room_blank;
-
     [SerializeField] Sprite door_right;
     [SerializeField] Sprite door_top;
     [SerializeField] Sprite door_left;
     [SerializeField] Sprite door_bottom;
 
-    [SerializeField] bool spawn_rooms = false;
+    private bool map_set = false;
+    private bool activated_doors = false;
+    private bool keys_set = false;
+    private bool doors_spawned = false;
 
-    [SerializeField] Difficulty difficulty;
+    private int grid_height = 10;
+    private int grid_width = 10;
+
+    public Slider size_slider;
+    public Slider rooms_slider;
+    public Text room_text;
+    public Text tiles_text;
+    private float tile_timer = 0.0f;
+    private float tile_timer_threshold = 0.5f;   
+    
     private int difficulty_num; 
 
     // Use this for initialization
@@ -124,6 +128,45 @@ public class MapCreator : MonoBehaviour {
             if (!map_set)
             {
                 UpdateMapState();
+            }
+        }
+
+        if (map_set)
+        {
+            if (!doors_spawned)
+            {
+                SpawnDoorSystem();
+
+                doors_spawned = true;
+
+                return;
+            }
+
+            if ((doors_spawned) && (!activated_doors))
+            {
+                for (int i = 0; i < room_stats.Count; i++)
+                {
+                    room_stats[i].door.GetComponent<Door>().checking = true;
+                }
+
+                activated_doors = true;
+                return;
+            }
+
+            if ((activated_doors) && (!keys_set))
+            {
+                for (int i = 0; i < room_stats.Count; i++)
+                {
+                    if (!room_stats[i].door.GetComponent<Door>().checking)
+                    {
+                        room_stats[i].door.GetComponent<Door>().SpawnKey();
+
+                        if (i == room_stats.Count)
+                        {
+                            keys_set = true;
+                        }
+                    }
+                }
             }
         }
     }
@@ -328,6 +371,11 @@ public class MapCreator : MonoBehaviour {
 
         TileScript door = _door.GetComponent<TileScript>();
 
+        //GameObject door_pref = Instantiate(door_prefab, _door.transform.position, _door.transform.rotation);
+        //door_pref.GetComponent<Door>().door_pos = Door_Position.bottom;
+        //door_pref.GetComponent<Door>().floor = door;
+        //door_pref.GetComponent<Door>().possibile_locations_to_check.Add(door);
+
         GameObject[] room_floor_tiles = new GameObject[room_height * room_width];
 
         if (door.sprite_rend.sprite = door_bottom)
@@ -364,6 +412,18 @@ public class MapCreator : MonoBehaviour {
             int room_id_num = room_stats.Count;
             Room room = new Room();
             room.id = room_id_num;
+            room.door_floor = _door; 
+
+            int rand_col_1 = Random.Range(0, 255);
+            int rand_col_2 = Random.Range(0, 255);
+            int rand_col_3 = Random.Range(0, 255);
+
+            Color32 col = new Color32((byte)rand_col_1, (byte)rand_col_2, (byte)rand_col_3, 255);
+
+            room.door_colour = col;
+
+            //door_pref.GetComponent<SpriteRenderer>().color = room.door_colour;
+
             room_stats.Add(room);
             rooms++;
 
@@ -405,5 +465,21 @@ public class MapCreator : MonoBehaviour {
             }
         }        
         return true;
+    }
+
+    void SpawnDoorSystem()
+    {
+        for (int i = 0; i < room_stats.Count; i++)
+        {
+            TileScript door = room_stats[i].door_floor.GetComponent<TileScript>();
+
+            GameObject door_pref = Instantiate(door_prefab, room_stats[i].door_floor.transform.position, room_stats[i].door_floor.transform.rotation);
+            door_pref.GetComponent<Door>().door_pos = Door_Position.bottom;
+            door_pref.GetComponent<Door>().floor = door;
+            door_pref.GetComponent<Door>().possibile_locations_to_check.Add(door);
+            door_pref.GetComponent<SpriteRenderer>().color = room_stats[i].door_colour;
+
+            room_stats[i].door = door_pref;
+        }
     }
 }

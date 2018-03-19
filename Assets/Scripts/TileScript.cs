@@ -735,9 +735,9 @@ public class TileScript : MonoBehaviour {
         {
             if (sprite_rend.sprite == door_bottom)
             {
-                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
+                if (((adjacent_tiles[3]) && (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[0]) && (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[1]) && (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank)))
                 {
                     sprite_rend.sprite = room_blank;
                     gameObject.tag = "RoomTile";
@@ -751,9 +751,9 @@ public class TileScript : MonoBehaviour {
 
             if (sprite_rend.sprite == door_left)
             {
-                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
+                if (((adjacent_tiles[3]) && (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[0]) && (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[2]) && (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank)))
                 {
                     sprite_rend.sprite = room_blank;
                     gameObject.tag = "RoomTile";
@@ -767,9 +767,9 @@ public class TileScript : MonoBehaviour {
 
             if (sprite_rend.sprite == door_right)
             {
-                if ((adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
+                if (((adjacent_tiles[2]) && (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[0]) && (adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[1]) && (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank)))
                 {
                     sprite_rend.sprite = room_blank;
                     gameObject.tag = "RoomTile";
@@ -783,9 +783,9 @@ public class TileScript : MonoBehaviour {
 
             if (sprite_rend.sprite == door_top)
             {
-                if ((adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank) ||
-                    (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank))
+                if (((adjacent_tiles[3]) && (adjacent_tiles[3].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[2]) && (adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite == room_blank)) ||
+                    ((adjacent_tiles[1]) && (adjacent_tiles[1].GetComponent<TileScript>().sprite_rend.sprite == room_blank)))
                 {
                     sprite_rend.sprite = room_blank;
                     gameObject.tag = "RoomTile";
@@ -804,6 +804,7 @@ public class TileScript : MonoBehaviour {
                     if (adjacent_tiles[0].tag == "Tile")
                     {
                         adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite = room_bottom_right;
+                        adjacent_tiles[0].tag = "RoomTileWall";
                     }
                 }
 
@@ -812,6 +813,7 @@ public class TileScript : MonoBehaviour {
                     if (adjacent_tiles[2].tag == "Tile")
                     {
                         adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite = room_top_right;
+                        adjacent_tiles[2].tag = "RoomTileWall";
                     }
                 }
             }
@@ -823,6 +825,7 @@ public class TileScript : MonoBehaviour {
                     if (adjacent_tiles[0].tag == "Tile")
                     {
                         adjacent_tiles[0].GetComponent<TileScript>().sprite_rend.sprite = room_bottom_left;
+                        adjacent_tiles[0].tag = "RoomTileWall";
                     }
                 }
 
@@ -831,6 +834,7 @@ public class TileScript : MonoBehaviour {
                     if (adjacent_tiles[2].tag == "Tile")
                     {
                         adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite = room_top_left;
+                        adjacent_tiles[2].tag = "RoomTileWall";
                     }
                 }
             }

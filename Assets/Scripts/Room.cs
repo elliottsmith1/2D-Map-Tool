@@ -9,14 +9,7 @@ public class Room : MonoBehaviour {
     public bool door_top = false;
     public bool door_bottom = true;
     public int id;
-
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public Color32 door_colour;
+    public GameObject door_floor;
+    public GameObject door;
 }
