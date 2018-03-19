@@ -52,7 +52,9 @@ public class MapCreator : MonoBehaviour {
     private float tile_timer = 0.0f;
     private float tile_timer_threshold = 0.5f;   
     
-    private int difficulty_num; 
+    private int difficulty_num;
+
+    private List<GameObject> doors_and_keys = new List<GameObject>();
 
     // Use this for initialization
     void Start ()
@@ -146,7 +148,7 @@ public class MapCreator : MonoBehaviour {
             {
                 for (int i = 0; i < room_stats.Count; i++)
                 {
-                    room_stats[i].door.GetComponent<Door>().checking = true;
+                    room_stats[i].doors[0].GetComponent<Door>().checking = true;
                 }
 
                 activated_doors = true;
@@ -157,13 +159,16 @@ public class MapCreator : MonoBehaviour {
             {
                 for (int i = 0; i < room_stats.Count; i++)
                 {
-                    if (!room_stats[i].door.GetComponent<Door>().checking)
+                    if (room_stats[i].doors[0])
                     {
-                        room_stats[i].door.GetComponent<Door>().SpawnKey();
-
-                        if (i == room_stats.Count)
+                        if (!room_stats[i].doors[0].GetComponent<Door>().checking)
                         {
-                            keys_set = true;
+                            room_stats[i].doors[0].GetComponent<Door>().SpawnKey();
+
+                            if (i == room_stats.Count)
+                            {
+                                keys_set = true;
+                            }
                         }
                     }
                 }
@@ -337,7 +342,24 @@ public class MapCreator : MonoBehaviour {
 
             tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
         }
-    }
+
+        for (int i = 0; i < doors_and_keys.Count; i++)
+        {
+            if (doors_and_keys[i])
+            {
+                doors_and_keys[i].GetComponent<Door>().DestroyDoorAndKey();
+            }
+            
+        }
+
+        doors_and_keys.Clear();
+
+        activated_doors = false;
+        keys_set = false;
+        doors_spawned = false;
+
+        room_stats.Clear();
+}
 
     public void AddTile()
     {
@@ -412,7 +434,7 @@ public class MapCreator : MonoBehaviour {
             int room_id_num = room_stats.Count;
             Room room = new Room();
             room.id = room_id_num;
-            room.door_floor = _door; 
+            room.door_floors[0] = _door; 
 
             int rand_col_1 = Random.Range(0, 255);
             int rand_col_2 = Random.Range(0, 255);
@@ -471,15 +493,45 @@ public class MapCreator : MonoBehaviour {
     {
         for (int i = 0; i < room_stats.Count; i++)
         {
-            TileScript door = room_stats[i].door_floor.GetComponent<TileScript>();
+            TileScript door = room_stats[i].door_floors[0].GetComponent<TileScript>();
 
-            GameObject door_pref = Instantiate(door_prefab, room_stats[i].door_floor.transform.position, room_stats[i].door_floor.transform.rotation);
+            GameObject door_pref = Instantiate(door_prefab, room_stats[i].door_floors[0].transform.position, room_stats[i].door_floors[0].transform.rotation);
             door_pref.GetComponent<Door>().door_pos = Door_Position.bottom;
             door_pref.GetComponent<Door>().floor = door;
             door_pref.GetComponent<Door>().possibile_locations_to_check.Add(door);
             door_pref.GetComponent<SpriteRenderer>().color = room_stats[i].door_colour;
 
-            room_stats[i].door = door_pref;
+            room_stats[i].doors.Add(door_pref);
+
+            doors_and_keys.Add(door_pref);
+
+            for (int j = 1; j < 4; j++)
+            {
+                if (room_stats[i].door_floors[j])
+                {
+                    GameObject door_ad = Instantiate(door_prefab, room_stats[i].door_floors[j].transform.position, room_stats[i].door_floors[j].transform.rotation);
+                    door_ad.GetComponent<SpriteRenderer>().color = room_stats[i].door_colour;
+                    door_ad.GetComponent<Door>().floor = room_stats[i].door_floors[j].GetComponent<TileScript>();
+
+                    doors_and_keys.Add(door_ad);
+
+                    switch (j)
+                    {
+                        case 0:
+                            door_ad.GetComponent<Door>().door_pos = Door_Position.bottom;
+                            break;
+                        case 1:
+                            door_ad.GetComponent<Door>().door_pos = Door_Position.right;
+                            break;
+                        case 2:
+                            door_ad.GetComponent<Door>().door_pos = Door_Position.top;
+                            break;
+                        case 3:
+                            door_ad.GetComponent<Door>().door_pos = Door_Position.left;
+                            break;
+                    }
+                }
+            }
         }
     }
 }

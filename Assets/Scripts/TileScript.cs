@@ -518,6 +518,7 @@ public class TileScript : MonoBehaviour {
                                     adjacent_room_tile.open_down = true;
 
                                     map_creator.room_stats[room_id].door_bottom = true;
+                                    map_creator.room_stats[room_id].door_floors[0] = (adjacent_room_tile.gameObject);
                                 }
 
                                 else
@@ -570,6 +571,7 @@ public class TileScript : MonoBehaviour {
                                     adjacent_room_tile.open_right = true;
 
                                     map_creator.room_stats[room_id].door_right = true;
+                                    map_creator.room_stats[room_id].door_floors[1] = (adjacent_room_tile.gameObject);
                                 }
 
                                 else
@@ -622,6 +624,7 @@ public class TileScript : MonoBehaviour {
                                     adjacent_room_tile.open_up = true;
 
                                     map_creator.room_stats[room_id].door_top = true;
+                                    map_creator.room_stats[room_id].door_floors[2] = (adjacent_room_tile.gameObject);
                                 }
 
                                 else
@@ -674,6 +677,7 @@ public class TileScript : MonoBehaviour {
                                     adjacent_room_tile.open_left = true;
 
                                     map_creator.room_stats[room_id].door_left = true;
+                                    map_creator.room_stats[room_id].door_floors[3] = (adjacent_room_tile.gameObject);
                                 }
 
                                 else
@@ -816,6 +820,17 @@ public class TileScript : MonoBehaviour {
                         adjacent_tiles[2].tag = "RoomTileWall";
                     }
                 }
+
+                if (adjacent_tiles[0] && adjacent_tiles[2])
+                {
+                    if (adjacent_tiles[0].GetComponent<SpriteRenderer>().sprite == room_right)
+                    {
+                        if (adjacent_tiles[2].GetComponent<SpriteRenderer>().sprite == room_right)
+                        {
+                            sprite_rend.sprite = room_right;
+                        }
+                    }
+                }
             }
 
             else if ((sprite_rend.sprite == room_left) || (sprite_rend.sprite == door_left))
@@ -835,6 +850,17 @@ public class TileScript : MonoBehaviour {
                     {
                         adjacent_tiles[2].GetComponent<TileScript>().sprite_rend.sprite = room_top_left;
                         adjacent_tiles[2].tag = "RoomTileWall";
+                    }
+                }
+
+                if (adjacent_tiles[0] && adjacent_tiles[2])
+                {
+                    if (adjacent_tiles[0].GetComponent<SpriteRenderer>().sprite == room_left)
+                    {
+                        if (adjacent_tiles[2].GetComponent<SpriteRenderer>().sprite == room_left)
+                        {
+                            sprite_rend.sprite = room_left;
+                        }
                     }
                 }
             }

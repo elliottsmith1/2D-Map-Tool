@@ -15,7 +15,10 @@ public class Door : MonoBehaviour {
     public List<TileScript> possibile_locations_to_check = new List<TileScript>();
 
     [SerializeField] Sprite blank;
+    [SerializeField] Sprite blank_floor;
     [SerializeField] GameObject key_prefab;
+
+    private GameObject key_ref;
 
     public bool checking = false;
     public bool key_spawned = false;
@@ -26,15 +29,28 @@ public class Door : MonoBehaviour {
         float offset = 0.24f;
 
         Vector3 pos = new Vector3(0.0f, 0.0f, 0.0f);
+        pos.z = -1;
+        pos.x = gameObject.transform.position.x;
+        pos.y = gameObject.transform.position.y;
 
-		switch (door_pos)
+        switch (door_pos)
         {
             case Door_Position.bottom:
-                pos.z = -1;
-                pos.x = gameObject.transform.position.x;
-                pos.y = gameObject.transform.position.y;
-
                 pos.y -= offset;
+                gameObject.transform.position = pos;
+                break;
+            case Door_Position.left:
+                pos.x -= offset;
+                gameObject.transform.position = pos;
+                gameObject.transform.Rotate(0, 0, 90);              
+                break;
+            case Door_Position.right:
+                pos.x += offset;
+                gameObject.transform.position = pos;
+                gameObject.transform.Rotate(0, 0, 90);
+                break;
+            case Door_Position.top:
+                pos.y += offset;
                 gameObject.transform.position = pos;
                 break;
             default:
@@ -49,7 +65,67 @@ public class Door : MonoBehaviour {
         {
             CheckPath();
         }
+
+        if (!checking)
+        {
+            EdgeCases();
+        }
 	}
+
+    void EdgeCases()
+    {
+        bool destroy = false;
+
+        if ((door_pos == Door_Position.left) || (door_pos == Door_Position.right))
+        {
+            if (floor.adjacent_tiles[2])
+            {
+                if ((floor.adjacent_tiles[2].GetComponent<SpriteRenderer>().sprite == blank) ||
+                        (floor.adjacent_tiles[2].GetComponent<SpriteRenderer>().sprite == blank_floor))
+                {
+                    destroy = true;
+                }
+            }
+
+            if (floor.adjacent_tiles[0])
+            {
+                if ((floor.adjacent_tiles[0].GetComponent<SpriteRenderer>().sprite == blank) ||
+                        (floor.adjacent_tiles[0].GetComponent<SpriteRenderer>().sprite == blank_floor))
+                {
+                    destroy = true;
+
+                }
+            }
+        }
+
+        if ((door_pos == Door_Position.top) || (door_pos == Door_Position.bottom))
+        {
+            if (floor.adjacent_tiles[1])
+            {
+                if ((floor.adjacent_tiles[1].GetComponent<SpriteRenderer>().sprite == blank) ||
+                        (floor.adjacent_tiles[1].GetComponent<SpriteRenderer>().sprite == blank_floor))
+                {
+                    destroy = true;
+                }
+            }
+
+            if (floor.adjacent_tiles[3])
+            {
+                if ((floor.adjacent_tiles[3].GetComponent<SpriteRenderer>().sprite == blank) ||
+                        (floor.adjacent_tiles[3].GetComponent<SpriteRenderer>().sprite == blank_floor))
+                {
+                    destroy = true;
+
+                }
+            }
+        }
+
+        if (destroy)
+        {
+            Destroy(this.gameObject);
+        }
+
+    }
 
     void CheckPath()
     {
@@ -174,8 +250,16 @@ public class Door : MonoBehaviour {
                 GameObject key = Instantiate(key_prefab, spawn_pos, transform.rotation);
                 key.GetComponent<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color;
 
+                key_ref = key;
+
                 key_spawned = true;
             }
         }
+    }
+
+    public void DestroyDoorAndKey()
+    {
+        Destroy(key_ref);
+        Destroy(this.gameObject);
     }
 }

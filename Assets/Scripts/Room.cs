@@ -10,6 +10,6 @@ public class Room : MonoBehaviour {
     public bool door_bottom = true;
     public int id;
     public Color32 door_colour;
-    public GameObject door_floor;
-    public GameObject door;
+    public GameObject[] door_floors = new GameObject[4];
+    public List<GameObject> doors = new List<GameObject>();
 }
