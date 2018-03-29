@@ -109,6 +109,27 @@ public static class FileManagement
         }
     }
 
+    public static int LoadSpawnPoint(String _file_name)
+    {
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
+
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+
+            return data.spawn_point;
+        }
+
+        else
+        {
+            Debug.LogError("File not found");
+            return 0;
+        }
+    }
+
     [Serializable]
     public class Map
     {
@@ -116,6 +137,7 @@ public static class FileManagement
         public int[] map;
         public int rooms = 0;
         public int grid_size = 0;
+        public int spawn_point = 0;
 
         public Map(MapData _map)
         {
@@ -123,6 +145,7 @@ public static class FileManagement
             map = _map.map;
             rooms = _map.rooms;
             grid_size = _map.grid_size;
+            spawn_point = _map.spawn_point;
         }
     }
 

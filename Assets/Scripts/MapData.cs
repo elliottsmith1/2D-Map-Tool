@@ -9,6 +9,7 @@ public class MapData : MonoBehaviour
     public int[] map = new int[3];
     public int rooms = 0;
     public int grid_size = 0;
+    public int spawn_point = 0;
     [SerializeField] FilesList files_list;
     [SerializeField] InputField text_input;
     [SerializeField] MapCreator map_creator;
@@ -44,6 +45,7 @@ public class MapData : MonoBehaviour
         rooms = FileManagement.LoadMapRooms(files_dropdown.captionText.text);
         grid_size = FileManagement.LoadMapSize(files_dropdown.captionText.text);
         map = FileManagement.LoadMap(files_dropdown.captionText.text);
+        spawn_point = FileManagement.LoadSpawnPoint(files_dropdown.captionText.text);
 
         map_creator.LoadMap();
     }

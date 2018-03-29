@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public enum Difficulty
 {
@@ -44,6 +46,7 @@ public class MapCreator : MonoBehaviour {
 
     private int grid_height = 10;
     private int grid_width = 10;
+    private int spawn_point;
 
     public Slider size_slider;
     public Slider rooms_slider;
@@ -59,7 +62,7 @@ public class MapCreator : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        switch(difficulty)
+        switch (difficulty)
         {
             case Difficulty.easy:
                 difficulty_num = 50;
@@ -79,6 +82,12 @@ public class MapCreator : MonoBehaviour {
         room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
         tiles_text.text = "Tiles: " + tile_total.ToString() + " / " + (tiles.Length / 5).ToString();
     }
+
+    void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(map_data);
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -93,7 +102,11 @@ public class MapCreator : MonoBehaviour {
         if (rooms_required != rooms_slider.value)
         {
             rooms_required = (int)rooms_slider.value;
-            room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+
+            if (room_text)
+            {
+                room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
+            }
 
             if (rooms_required == 0)
             {
@@ -181,12 +194,13 @@ public class MapCreator : MonoBehaviour {
         map_set = true;
 
         grid_size = map_data.grid_size;
-        size_slider.value = grid_size;   
+        size_slider.value = grid_size;              
 
         ResetGrid();
 
         rooms = map_data.rooms;
         rooms_slider.value = rooms;
+        spawn_point = map_data.spawn_point;
 
         room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
 
@@ -203,6 +217,8 @@ public class MapCreator : MonoBehaviour {
             tiles[i].GetComponent<TileScript>().tile_type = map_data.map[i];
             tiles[i].GetComponent<TileScript>().LoadTile();
         }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("game");
     }
 
     void UpdateMapState()
@@ -216,6 +232,7 @@ public class MapCreator : MonoBehaviour {
 
         map_data.rooms = rooms;
         map_data.grid_size = grid_size;
+        map_data.spawn_point = spawn_point;
 
         map_set = true;
     }
@@ -266,6 +283,8 @@ public class MapCreator : MonoBehaviour {
         if (!map_set)
         {
             int tile_rand = Random.Range(0, tiles.Length);
+
+            spawn_point = tile_rand;
 
             tiles[tile_rand].GetComponent<TileScript>().open_right = true;
             tiles[tile_rand].GetComponent<TileScript>().open_up = true;
@@ -334,6 +353,8 @@ public class MapCreator : MonoBehaviour {
         if (!map_set)
         {
             int tile_rand = Random.Range(0, tiles.Length);
+
+            spawn_point = tile_rand;
 
             tiles[tile_rand].GetComponent<TileScript>().open_right = true;
             tiles[tile_rand].GetComponent<TileScript>().open_up = true;
@@ -533,5 +554,12 @@ public class MapCreator : MonoBehaviour {
                 }
             }
         }
+    }
+
+    public void CreateGame(GameManager _manager)
+    {
+        _manager.CreateMap(map_data.map, map_data.grid_size, map_data.spawn_point);
+
+        Destroy(this.gameObject);
     }
 }

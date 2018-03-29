@@ -23,14 +23,6 @@ public class FilesList : MonoBehaviour
 
     public void AddFile(string _file)
     {
-        //for (int i = 0; i < file_names.Count; i++)
-        //{
-        //    if (file_names[i] == _file)
-        //    {
-        //        return;
-        //    }
-        //}
-
         if (file_names == null)
         {
             file_names = new List<string>();
