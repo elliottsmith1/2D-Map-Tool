@@ -4,14 +4,34 @@ using UnityEngine;
 
 public class MoveWall : MonoBehaviour {
 
+    private bool move = true;
+
 	// Use this for initialization
 	void Start () {
 		
 	}
 	
 	// Update is called once per frame
-	void Update () {
-        transform.position += Vector3.forward * Time.deltaTime;
+	void FixedUpdate ()
+    {
+        if (move)
+        {
+            transform.position += transform.forward * Time.deltaTime * 100;
 
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, transform.forward, out hit, 100.0f))
+            {
+                move = false;
+                //transform.position = hit.gameObject.transform.position;
+
+                transform.position = transform.position + (transform.forward * hit.distance);
+            }
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        //move = false;
     }
 }

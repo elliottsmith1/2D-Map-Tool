@@ -28,6 +28,7 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] GameObject tile_prefab;
     [SerializeField] GameObject door_prefab;
     [SerializeField] GameObject[] tiles;
+    [SerializeField] GameObject loading_screen;
     public List<Room> room_stats;
 
     [Header("Sprite References")]
@@ -132,10 +133,17 @@ public class MapCreator : MonoBehaviour {
 
         if ((spawn_grid) || ((tile_timer > tile_timer_threshold) && ((tile_total < (tiles.Length / 5)) || (rooms < rooms_required))))
         {
+            if (!loading_screen.activeSelf)
+            {
+                loading_screen.SetActive(true);
+            }
+
             ResetGrid();            
 
             spawn_grid = false;
             map_set = false;
+
+            
         }
 
         if (tile_timer > tile_timer_threshold)
@@ -143,6 +151,8 @@ public class MapCreator : MonoBehaviour {
             if (!map_set)
             {
                 UpdateMapState();
+
+                loading_screen.SetActive(false);
             }
         }
 
@@ -180,10 +190,18 @@ public class MapCreator : MonoBehaviour {
 
                             if (i == room_stats.Count)
                             {
-                                keys_set = true;
+                                keys_set = true;                                
                             }
                         }
                     }
+                }
+            }
+
+            if (keys_set)
+            {
+                if (map_data.keys.Count != map_data.doors.Count)
+                {
+                    ResetGrid();
                 }
             }
         }
@@ -216,15 +234,13 @@ public class MapCreator : MonoBehaviour {
         {
             tiles[i].GetComponent<TileScript>().tile_type = map_data.map[i];
             tiles[i].GetComponent<TileScript>().LoadTile();
-        }
-
-        UnityEngine.SceneManagement.SceneManager.LoadScene("game");
+        }        
     }
 
     void UpdateMapState()
     {
         for (int i = 0; i < tiles.Length; i++)
-        {
+        {            
             tiles[i].GetComponent<TileScript>().SetType();
 
             map_data.map[i] = tiles[i].GetComponent<TileScript>().tile_type;
@@ -255,29 +271,20 @@ public class MapCreator : MonoBehaviour {
         {
             for (int j = 0; j < grid_width; j++)
             {
-                tile_positions[i + grid_width * j].x = width;
-                tile_positions[i + grid_width * j].y = height;
+                Vector3 position = new Vector3(width, height, 0.0f);
+
+                GameObject tile = tile_prefab;
+
+                tile.GetComponent<TileScript>().id = j + grid_size * i;
+                tile.GetComponent<TileScript>().SetDifficulty(difficulty_num);
+                tile.GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
+
+                tiles[i + grid_size * j] = Instantiate(tile, position, Quaternion.identity);
 
                 width += 0.64f;
             }
             height += 0.64f;
             width = 0.0f;
-        }
-
-        for (int i = 0; i < tile_positions.Length; i++)
-        {
-            Vector3 position;
-            position.z = 0.0f;
-            position.x = tile_positions[i].x;
-            position.y = tile_positions[i].y;
-
-            GameObject tile = tile_prefab;
-
-            tile.GetComponent<TileScript>().id = i;
-            tile.GetComponent<TileScript>().SetDifficulty(difficulty_num);
-            tile.GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
-
-            tiles[i] = Instantiate(tile, position, Quaternion.identity);
         }
 
         if (!map_set)
@@ -516,6 +523,8 @@ public class MapCreator : MonoBehaviour {
         {
             TileScript door = room_stats[i].door_floors[0].GetComponent<TileScript>();
 
+            map_data.doors.Add(room_stats[i].door_floors[0].GetComponent<TileScript>().id);
+
             GameObject door_pref = Instantiate(door_prefab, room_stats[i].door_floors[0].transform.position, room_stats[i].door_floors[0].transform.rotation);
             door_pref.GetComponent<Door>().door_pos = Door_Position.bottom;
             door_pref.GetComponent<Door>().floor = door;
@@ -531,6 +540,9 @@ public class MapCreator : MonoBehaviour {
                 if (room_stats[i].door_floors[j])
                 {
                     GameObject door_ad = Instantiate(door_prefab, room_stats[i].door_floors[j].transform.position, room_stats[i].door_floors[j].transform.rotation);
+
+                    //map_data.doors.Add(room_stats[i].door_floors[0].GetComponent<TileScript>().id);
+
                     door_ad.GetComponent<SpriteRenderer>().color = room_stats[i].door_colour;
                     door_ad.GetComponent<Door>().floor = room_stats[i].door_floors[j].GetComponent<TileScript>();
 
@@ -558,8 +570,16 @@ public class MapCreator : MonoBehaviour {
 
     public void CreateGame(GameManager _manager)
     {
-        _manager.CreateMap(map_data.map, map_data.grid_size, map_data.spawn_point);
+        _manager.CreateMap(map_data.map, map_data.grid_size, map_data.spawn_point, map_data.doors, map_data.keys);
+    }
 
-        Destroy(this.gameObject);
+    public void PlayGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("game");
+    }
+
+    public void AddKey(int _id)
+    {
+        map_data.keys.Add(_id);
     }
 }

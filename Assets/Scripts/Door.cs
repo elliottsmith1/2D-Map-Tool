@@ -18,6 +18,7 @@ public class Door : MonoBehaviour {
     [SerializeField] Sprite blank_floor;
     [SerializeField] GameObject key_prefab;
 
+    private MapCreator map_creator_ref;
     private GameObject key_ref;
 
     public bool checking = false;
@@ -26,6 +27,8 @@ public class Door : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        map_creator_ref = GameObject.Find("Map Creator").GetComponent<MapCreator>();
+
         float offset = 0.24f;
 
         Vector3 pos = new Vector3(0.0f, 0.0f, 0.0f);
@@ -93,7 +96,6 @@ public class Door : MonoBehaviour {
                         (floor.adjacent_tiles[0].GetComponent<SpriteRenderer>().sprite == blank_floor))
                 {
                     destroy = true;
-
                 }
             }
         }
@@ -115,7 +117,6 @@ public class Door : MonoBehaviour {
                         (floor.adjacent_tiles[3].GetComponent<SpriteRenderer>().sprite == blank_floor))
                 {
                     destroy = true;
-
                 }
             }
         }
@@ -244,6 +245,8 @@ public class Door : MonoBehaviour {
                 int random_num = Random.Range(ratio, possibile_locations.Count);
 
                 Vector3 spawn_pos = possibile_locations[random_num].gameObject.transform.position;
+
+                map_creator_ref.AddKey(possibile_locations[random_num].id);
 
                 spawn_pos.z = -1;
 

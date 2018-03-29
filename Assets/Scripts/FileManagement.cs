@@ -130,6 +130,46 @@ public static class FileManagement
         }
     }
 
+    public static List<int> LoadDoors(String _file_name)
+    {
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
+
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+            return data.doors;
+        }
+
+        else
+        {
+            Debug.LogError("File not found");
+            return null;
+        }
+    }
+
+    public static List<int> LoadKeys(String _file_name)
+    {
+        if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Open);
+
+            Map data = bf.Deserialize(stream) as Map;
+
+            stream.Close();
+            return data.keys;
+        }
+
+        else
+        {
+            Debug.LogError("File not found");
+            return null;
+        }
+    }
+
     [Serializable]
     public class Map
     {
@@ -138,6 +178,8 @@ public static class FileManagement
         public int rooms = 0;
         public int grid_size = 0;
         public int spawn_point = 0;
+        public List<int> doors;
+        public List<int> keys;
 
         public Map(MapData _map)
         {
@@ -146,6 +188,8 @@ public static class FileManagement
             rooms = _map.rooms;
             grid_size = _map.grid_size;
             spawn_point = _map.spawn_point;
+            doors = _map.doors;
+            keys = _map.keys;
         }
     }
 
