@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject key_UI_prefab;
     [SerializeField] GameObject player;
 
+    [SerializeField] List<GameObject> outer_walls;
+
     private int[] map = new int[3];
     private List<GameObject> floor_tiles = new List<GameObject>();
     private MapCreator map_creator;
@@ -40,7 +42,6 @@ public class GameManager : MonoBehaviour {
         {
             float pos = -600 + (i * 100);
 
-            //if (keys_ui[i].transform.position.x != pos)
             if (keys_ui[i].transform.localPosition.x != pos)
             {
                 Vector3 new_pos = transform.localPosition;
@@ -58,11 +59,25 @@ public class GameManager : MonoBehaviour {
         RenderSettings.fogDensity = 0.2f;
         RenderSettings.fogColor = Color.black;
 
-        locked_doors = _doors.Count;
-
         map_creator.gameObject.SetActive(false);
 
         map = _map;
+
+        Vector3 new_pos;
+
+        new_pos = outer_walls[1].transform.position;
+
+        new_pos.z += _size * 2;
+        new_pos.z -= 1;
+
+        outer_walls[1].transform.position = new_pos;
+
+        new_pos = outer_walls[3].transform.position;
+
+        new_pos.x += _size * 2;
+        new_pos.x -= 1;
+
+        outer_walls[3].transform.position = new_pos;
 
         float width = 0;
         float height = 0;
@@ -100,27 +115,35 @@ public class GameManager : MonoBehaviour {
             }
             height += 2.0f;
             width = 0.0f;
-        }
+        }        
 
         for (int i = 0; i < _doors.Count; i++)
         {
-            Vector3 spawn_pos = floor_tiles[_doors[i]].transform.position;
-            spawn_pos.y = 1.5f;
+            if (i < _keys.Count)
+            {
+                if ((_doors[i] <= floor_tiles.Count) && (_keys[i] <= floor_tiles.Count))
+                {
+                    Vector3 spawn_pos = floor_tiles[_doors[i]].transform.position;
+                    spawn_pos.y = 1.5f;
 
-            GameObject door = Instantiate(door_prefab, spawn_pos, Quaternion.identity);
+                    GameObject door = Instantiate(door_prefab, spawn_pos, Quaternion.identity);
 
-            spawn_pos = floor_tiles[_keys[i]].transform.position;
-            spawn_pos.y = 1.5f;
+                    locked_doors++;
 
-            GameObject key = Instantiate(key_prefab, spawn_pos, Quaternion.identity);
+                    spawn_pos = floor_tiles[_keys[i]].transform.position;
+                    spawn_pos.y = 1.5f;
 
-            int rand_col_1 = Random.Range(0, 255);
-            int rand_col_2 = Random.Range(0, 255);
-            int rand_col_3 = Random.Range(0, 255);
-            Color32 col = new Color32((byte)rand_col_1, (byte)rand_col_2, (byte)rand_col_3, 255);
+                    GameObject key = Instantiate(key_prefab, spawn_pos, Quaternion.identity);
 
-            key.GetComponent<Renderer>().material.color = col;
-            door.transform.GetChild(0).GetComponent<Renderer>().material.color = col;
+                    int rand_col_1 = Random.Range(0, 255);
+                    int rand_col_2 = Random.Range(0, 255);
+                    int rand_col_3 = Random.Range(0, 255);
+                    Color32 col = new Color32((byte)rand_col_1, (byte)rand_col_2, (byte)rand_col_3, 255);
+
+                    key.GetComponent<Renderer>().material.color = col;
+                    door.transform.GetChild(0).GetComponent<Renderer>().material.color = col;
+                }
+            }
         }        
     }
 

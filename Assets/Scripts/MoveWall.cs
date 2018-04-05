@@ -23,7 +23,6 @@ public class MoveWall : MonoBehaviour {
             if (Physics.Raycast(transform.position, transform.forward, out hit, 100.0f))
             {
                 move = false;
-                //transform.position = hit.gameObject.transform.position;
 
                 transform.position = transform.position + (transform.forward * hit.distance);
             }

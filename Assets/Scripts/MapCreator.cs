@@ -54,7 +54,7 @@ public class MapCreator : MonoBehaviour {
     public Text room_text;
     public Text tiles_text;
     private float tile_timer = 0.0f;
-    private float tile_timer_threshold = 0.5f;   
+    private float tile_timer_threshold = 0.3f;   
     
     private int difficulty_num;
 
@@ -150,9 +150,7 @@ public class MapCreator : MonoBehaviour {
         {
             if (!map_set)
             {
-                UpdateMapState();
-
-                loading_screen.SetActive(false);
+                UpdateMapState();                
             }
         }
 
@@ -164,6 +162,8 @@ public class MapCreator : MonoBehaviour {
 
                 doors_spawned = true;
 
+                tile_timer = 0.0f;
+
                 return;
             }
 
@@ -172,9 +172,10 @@ public class MapCreator : MonoBehaviour {
                 for (int i = 0; i < room_stats.Count; i++)
                 {
                     room_stats[i].doors[0].GetComponent<Door>().checking = true;
+                    tile_timer = 0.0f;
                 }
 
-                activated_doors = true;
+                activated_doors = true;                
                 return;
             }
 
@@ -185,23 +186,33 @@ public class MapCreator : MonoBehaviour {
                     if (room_stats[i].doors[0])
                     {
                         if (!room_stats[i].doors[0].GetComponent<Door>().checking)
-                        {
+                        {                            
                             room_stats[i].doors[0].GetComponent<Door>().SpawnKey();
 
-                            if (i == room_stats.Count)
+                            if (i == room_stats.Count - 1)
                             {
-                                keys_set = true;                                
-                            }
+                                if (tile_timer > tile_timer_threshold)
+                                {                                    
+                                    keys_set = true;
+
+                                    UpdateMapState();
+
+                                    loading_screen.SetActive(false);                                    
+                                }
+                                
+                                if (tile_timer > 10)
+                                {
+                                    ResetGrid();
+                                }                           
+                            }                           
                         }
                     }
-                }
-            }
 
-            if (keys_set)
-            {
-                if (map_data.keys.Count != map_data.doors.Count)
-                {
-                    ResetGrid();
+                    else
+                    {
+                        room_stats.RemoveAt(i);
+                        return;
+                    }
                 }
             }
         }
@@ -385,8 +396,7 @@ public class MapCreator : MonoBehaviour {
         activated_doors = false;
         keys_set = false;
         doors_spawned = false;
-
-        room_stats.Clear();
+        map_set = false;
 }
 
     public void AddTile()
@@ -420,11 +430,6 @@ public class MapCreator : MonoBehaviour {
         int room_width = Random.Range(3, 8);
 
         TileScript door = _door.GetComponent<TileScript>();
-
-        //GameObject door_pref = Instantiate(door_prefab, _door.transform.position, _door.transform.rotation);
-        //door_pref.GetComponent<Door>().door_pos = Door_Position.bottom;
-        //door_pref.GetComponent<Door>().floor = door;
-        //door_pref.GetComponent<Door>().possibile_locations_to_check.Add(door);
 
         GameObject[] room_floor_tiles = new GameObject[room_height * room_width];
 
@@ -471,8 +476,6 @@ public class MapCreator : MonoBehaviour {
             Color32 col = new Color32((byte)rand_col_1, (byte)rand_col_2, (byte)rand_col_3, 255);
 
             room.door_colour = col;
-
-            //door_pref.GetComponent<SpriteRenderer>().color = room.door_colour;
 
             room_stats.Add(room);
             rooms++;

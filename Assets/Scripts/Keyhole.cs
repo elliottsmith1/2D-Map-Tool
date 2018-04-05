@@ -35,10 +35,13 @@ public class Keyhole : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            if (game_manager.CheckKey(keyhole.GetComponent<Renderer>().material.color))
+            if (game_manager)
             {
-                open = true;
-            }            
+                if (game_manager.CheckKey(keyhole.GetComponent<Renderer>().material.color))
+                {
+                    open = true;
+                }
+            }
         }
     }
 }

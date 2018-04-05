@@ -228,7 +228,7 @@ public class Door : MonoBehaviour {
                 }
             }            
 
-            if (possibile_locations_to_check.Count < 1)
+            if (possibile_locations_to_check.Count == 0)
             {
                 checking = false;
             }

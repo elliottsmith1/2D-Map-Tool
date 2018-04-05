@@ -23,7 +23,11 @@ public class MapData : MonoBehaviour
         files_list.Save();        
 
         files_dropdown.ClearOptions();
-        files_dropdown.AddOptions(files_list.file_names);
+
+        if (files_list.file_names != null)
+        {
+            files_dropdown.AddOptions(files_list.file_names);
+        }
     }
 
     public void Save()
