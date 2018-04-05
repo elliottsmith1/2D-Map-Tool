@@ -54,7 +54,7 @@ public class MapCreator : MonoBehaviour {
     public Text room_text;
     public Text tiles_text;
     private float tile_timer = 0.0f;
-    private float tile_timer_threshold = 0.3f;   
+    private float tile_timer_threshold = 0.5f;   
     
     private int difficulty_num;
 
