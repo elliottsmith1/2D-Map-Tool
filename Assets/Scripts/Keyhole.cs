@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Keyhole : MonoBehaviour {
 
-    private bool open = false;
+    private bool open = false; //if locked
     private GameManager game_manager;
     [SerializeField] GameObject keyhole;
     private Vector3 original_pos;
@@ -20,6 +20,7 @@ public class Keyhole : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        //if opened then destroy when moved
 		if (open)
         {
             transform.Translate((-transform.up * Time.deltaTime) * open_speed);
@@ -33,6 +34,7 @@ public class Keyhole : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
+        //check if player had correct key when near
         if (other.tag == "Player")
         {
             if (game_manager)

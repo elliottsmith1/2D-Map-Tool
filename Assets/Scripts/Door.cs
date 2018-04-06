@@ -9,10 +9,10 @@ public enum Door_Position
 
 public class Door : MonoBehaviour {
 
-    public Door_Position door_pos = Door_Position.bottom;
-    public TileScript floor;
-    public List<TileScript> possibile_locations = new List<TileScript>();
-    public List<TileScript> possibile_locations_to_check = new List<TileScript>();
+    public Door_Position door_pos = Door_Position.bottom; //direction of door
+    public TileScript floor; //where places
+    public List<TileScript> possibile_locations = new List<TileScript>(); //potential spots to spawn key
+    public List<TileScript> possibile_locations_to_check = new List<TileScript>(); //potential spots that need checking
 
     [SerializeField] Sprite blank;
     [SerializeField] Sprite blank_floor;
@@ -29,6 +29,7 @@ public class Door : MonoBehaviour {
     {
         map_creator_ref = GameObject.Find("Map Creator").GetComponent<MapCreator>();
 
+        //offset position
         float offset = 0.24f;
 
         Vector3 pos = new Vector3(0.0f, 0.0f, 0.0f);
@@ -36,6 +37,7 @@ public class Door : MonoBehaviour {
         pos.x = gameObject.transform.position.x;
         pos.y = gameObject.transform.position.y;
 
+        //set direction//offset
         switch (door_pos)
         {
             case Door_Position.bottom:
@@ -77,6 +79,8 @@ public class Door : MonoBehaviour {
 
     void EdgeCases()
     {
+        //check edge cases in case door out of place
+        //if so, destroy
         bool destroy = false;
 
         if ((door_pos == Door_Position.left) || (door_pos == Door_Position.right))
@@ -130,10 +134,14 @@ public class Door : MonoBehaviour {
 
     void CheckPath()
     {
-        int num_to_check = 10;
+        //check path ahead and add positions to list of possible places to spawn key
+        //this way key is always within reach of door
+
+        int num_to_check = 10; //only check 10 per update to reduce lag
 
         bool new_tiles = false;
 
+        //check adjacent tiles and all their adjacent tiles
         if (possibile_locations_to_check.Count > 0)
         {
             for (int i = 0; i < num_to_check; i++)
@@ -150,40 +158,39 @@ public class Door : MonoBehaviour {
                                 {
                                     if (possibile_locations_to_check[i].adjacent_tiles[j] != floor.gameObject)
                                     {
-                                        //if (possibile_locations.Count < 100)
+                                        bool already_a_potential = false;
+
+                                        TileScript potential = possibile_locations_to_check[i].adjacent_tiles[j].GetComponent<TileScript>();
+
+                                        //check if position already checked
+                                        for (int k = 0; k < possibile_locations_to_check.Count; k++)
                                         {
-                                            bool already_a_potential = false;
-
-                                            TileScript potential = possibile_locations_to_check[i].adjacent_tiles[j].GetComponent<TileScript>();
-
-                                            for (int k = 0; k < possibile_locations_to_check.Count; k++)
+                                            if (possibile_locations_to_check[k] == potential)
                                             {
-                                                if (possibile_locations_to_check[k] == potential)
-                                                {
-                                                    already_a_potential = true;
-                                                }
+                                                already_a_potential = true;
                                             }
+                                        }
 
-                                            for (int l = 0; l < possibile_locations.Count; l++)
+                                        for (int l = 0; l < possibile_locations.Count; l++)
+                                        {
+                                            if (possibile_locations.Count != 0)
                                             {
-                                                if (possibile_locations.Count != 0)
+                                                if (possibile_locations[l])
                                                 {
-                                                    if (possibile_locations[l])
+                                                    if (possibile_locations[l] == potential)
                                                     {
-                                                        if (possibile_locations[l] == potential)
-                                                        {
-                                                            already_a_potential = true;
-                                                        }
+                                                        already_a_potential = true;
                                                     }
                                                 }
                                             }
+                                        }
 
-                                            if (!already_a_potential)
-                                            {
-                                                possibile_locations_to_check.Add(potential);
+                                        //add new possible position
+                                        if (!already_a_potential)
+                                        {
+                                            possibile_locations_to_check.Add(potential);
 
-                                                new_tiles = true;
-                                            }
+                                            new_tiles = true;
                                         }
                                     }
                                 }
@@ -194,6 +201,7 @@ public class Door : MonoBehaviour {
             }
 
 
+            //check 10 potential positions
             if (new_tiles)
             {
                 bool already_in_list = false;
@@ -212,6 +220,7 @@ public class Door : MonoBehaviour {
                             }
                         }
 
+                        //potential spawn positions
                         if (!already_in_list)
                         {
                             possibile_locations.Add(possibile_locations_to_check[i]);
@@ -220,6 +229,7 @@ public class Door : MonoBehaviour {
                 }                             
             }
 
+            //remove already checked positions
             for (int i = 0; i < num_to_check; i++)
             {
                 if (i < possibile_locations_to_check.Count)
@@ -228,6 +238,7 @@ public class Door : MonoBehaviour {
                 }
             }            
 
+            //if no more positions to check, stop checking
             if (possibile_locations_to_check.Count == 0)
             {
                 checking = false;
@@ -237,8 +248,10 @@ public class Door : MonoBehaviour {
 
     public void SpawnKey()
     {
+        //when all potential positions checked, spawn key
         if (!key_spawned)
         {
+            //spawn in last 10% to ensure key is far away
             int ratio = (int)(possibile_locations.Count / 1.1f);
             if (possibile_locations.Count > 0)
             {
@@ -250,12 +263,35 @@ public class Door : MonoBehaviour {
 
                 spawn_pos.z = -1;
 
+                //spawn key
                 GameObject key = Instantiate(key_prefab, spawn_pos, transform.rotation);
                 key.GetComponent<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color;
 
                 key_ref = key;
 
                 key_spawned = true;
+            }
+
+            //if key didnt spawn, try again but anywhere in the possible positions list
+            if (!key_spawned)
+            {
+                if (possibile_locations.Count > 0)
+                {
+                    int random_num = Random.Range(0, possibile_locations.Count);
+
+                    Vector3 spawn_pos = possibile_locations[random_num].gameObject.transform.position;
+
+                    map_creator_ref.AddKey(possibile_locations[random_num].id);
+
+                    spawn_pos.z = -1;
+
+                    GameObject key = Instantiate(key_prefab, spawn_pos, transform.rotation);
+                    key.GetComponent<SpriteRenderer>().color = gameObject.GetComponent<SpriteRenderer>().color;
+
+                    key_ref = key;
+
+                    key_spawned = true;
+                }
             }
         }
     }

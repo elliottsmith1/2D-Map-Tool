@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
+//*deprecated* difficult/chance to change direction of tunnel
 public enum Difficulty
 {
     easy, medium, hard
@@ -13,25 +14,26 @@ public enum Difficulty
 public class MapCreator : MonoBehaviour {
 
     [Header("Parameters")]
-    [SerializeField] bool spawn_grid = false;
-    [SerializeField] int grid_size = 10;
+    [SerializeField] bool spawn_grid = false; 
+    [SerializeField] int grid_size = 10; //width/height
     [SerializeField] int tile_total = 0;
-    [SerializeField] int tiles_required = 0;
+    [SerializeField] int tiles_required = 0; //percentage of grid to be covered
     [SerializeField] int rooms = 0;
-    [SerializeField] int rooms_required = 3;
-    [SerializeField] bool spawn_rooms = false;
+    [SerializeField] int rooms_required = 3; //set by user
+    [SerializeField] bool spawn_rooms = false; //whether to spawn rooms
     [SerializeField] Difficulty difficulty;
 
     [Header("References")]
-    [SerializeField] MapData map_data;
-    [SerializeField] Vector3[] tile_positions;
-    [SerializeField] GameObject tile_prefab;
+    [SerializeField] MapData map_data; //saved data on current map
+    [SerializeField] Vector3[] tile_positions; //used to spawn grid
+    [SerializeField] GameObject tile_prefab; 
     [SerializeField] GameObject door_prefab;
-    [SerializeField] GameObject[] tiles;
+    [SerializeField] GameObject[] tiles; //grid tiles
     [SerializeField] GameObject loading_screen;
-    public List<Room> room_stats;
+    public List<Room> room_stats; //room data
 
-    [Header("Sprite References")]
+    [Header("Sprite References")] 
+    //sprites to reference
     [SerializeField] Sprite junction;
     [SerializeField] Sprite blank;
     [SerializeField] Sprite room_blank;
@@ -40,18 +42,19 @@ public class MapCreator : MonoBehaviour {
     [SerializeField] Sprite door_left;
     [SerializeField] Sprite door_bottom;
 
-    private bool map_set = false;
-    private bool activated_doors = false;
-    private bool keys_set = false;
-    private bool doors_spawned = false;
+    private bool map_set = false; //if tiles are done setting
+    private bool activated_doors = false; //doors active or not
+    private bool keys_set = false; //spawned keys or not
+    private bool doors_spawned = false; //spawned doors or not
 
     private int grid_height = 10;
     private int grid_width = 10;
-    private int spawn_point;
+    private int spawn_point; //where to start grid/spwan player
 
-    public Slider size_slider;
-    public Slider rooms_slider;
-    public Text room_text;
+    //UI
+    public Slider size_slider; 
+    public Slider rooms_slider; 
+    public Text room_text; 
     public Text tiles_text;
     private float tile_timer = 0.0f;
     private float tile_timer_threshold = 0.5f;   
@@ -86,6 +89,7 @@ public class MapCreator : MonoBehaviour {
 
     void Awake()
     {
+        //use these when switching to game scene
         DontDestroyOnLoad(this.gameObject);
         DontDestroyOnLoad(map_data);
     }
@@ -95,6 +99,7 @@ public class MapCreator : MonoBehaviour {
 
         tile_timer += Time.deltaTime;
 
+        //set UI
         if (grid_size != size_slider.value)
         {
             grid_size = (int)size_slider.value;
@@ -131,6 +136,9 @@ public class MapCreator : MonoBehaviour {
             }
         }
 
+        //if parameters not met, restart 
+        //tiles spawned doesnt match percentage needed to cover (total / 5)
+        //number of rooms not enough
         if ((spawn_grid) || ((tile_timer > tile_timer_threshold) && ((tile_total < (tiles.Length / 5)) || (rooms < rooms_required))))
         {
             if (!loading_screen.activeSelf)
@@ -141,11 +149,10 @@ public class MapCreator : MonoBehaviour {
             ResetGrid();            
 
             spawn_grid = false;
-            map_set = false;
-
-            
+            map_set = false;            
         }
 
+        //when tiles no longer changing, update map state
         if (tile_timer > tile_timer_threshold)
         {
             if (!map_set)
@@ -154,6 +161,7 @@ public class MapCreator : MonoBehaviour {
             }
         }
 
+        //spawn doors onto rooms
         if (map_set)
         {
             if (!doors_spawned)
@@ -167,6 +175,7 @@ public class MapCreator : MonoBehaviour {
                 return;
             }
 
+            //activate doors (start checking where to spawn key)
             if ((doors_spawned) && (!activated_doors))
             {
                 for (int i = 0; i < room_stats.Count; i++)
@@ -179,6 +188,8 @@ public class MapCreator : MonoBehaviour {
                 return;
             }
 
+            //check if each door is ready to spawn key
+            //spawn keys
             if ((activated_doors) && (!keys_set))
             {
                 for (int i = 0; i < room_stats.Count; i++)
@@ -200,6 +211,7 @@ public class MapCreator : MonoBehaviour {
                                     loading_screen.SetActive(false);                                    
                                 }
                                 
+                                //if taking too long, restart
                                 if (tile_timer > 10)
                                 {
                                     ResetGrid();
@@ -208,6 +220,7 @@ public class MapCreator : MonoBehaviour {
                         }
                     }
 
+                    //delete rooms that no longer exist
                     else
                     {
                         room_stats.RemoveAt(i);
@@ -220,8 +233,10 @@ public class MapCreator : MonoBehaviour {
 
     public void LoadMap()
     {
+        //function to load a saved map
         map_set = true;
 
+        //pull map data from save
         grid_size = map_data.grid_size;
         size_slider.value = grid_size;              
 
@@ -250,6 +265,7 @@ public class MapCreator : MonoBehaviour {
 
     void UpdateMapState()
     {
+        //function to assign each tile a type
         for (int i = 0; i < tiles.Length; i++)
         {            
             tiles[i].GetComponent<TileScript>().SetType();
@@ -257,6 +273,7 @@ public class MapCreator : MonoBehaviour {
             map_data.map[i] = tiles[i].GetComponent<TileScript>().tile_type;
         }
 
+        //update save data
         map_data.rooms = rooms;
         map_data.grid_size = grid_size;
         map_data.spawn_point = spawn_point;
@@ -266,6 +283,8 @@ public class MapCreator : MonoBehaviour {
 
     void SpawnGrid()
     {
+        //function to spawn tiles in correct positions
+
         grid_height = grid_size;
         grid_width = grid_size;
 
@@ -278,6 +297,7 @@ public class MapCreator : MonoBehaviour {
         float width = 0;
         float height = 0;
 
+        //spawn tiles
         for (int i = 0; i < grid_height; i++)
         {
             for (int j = 0; j < grid_width; j++)
@@ -298,6 +318,7 @@ public class MapCreator : MonoBehaviour {
             width = 0.0f;
         }
 
+        //set random start point for dungeon
         if (!map_set)
         {
             int tile_rand = Random.Range(0, tiles.Length);
@@ -315,6 +336,8 @@ public class MapCreator : MonoBehaviour {
 
     public void ResetGrid()
     {
+        //reset everything
+
         tile_timer = 0.0f;
         tile_total = 0;
         rooms = 0;
@@ -360,6 +383,7 @@ public class MapCreator : MonoBehaviour {
 
         tiles_required = tiles.Length / 5;
 
+        //reset all tiles
         for (int i = 0; i < tiles.Length; i++)
         {
             tiles[i].GetComponent<SpriteRenderer>().sprite = blank;
@@ -368,6 +392,7 @@ public class MapCreator : MonoBehaviour {
             tiles[i].GetComponent<TileScript>().SetSpawnRooms(spawn_rooms);
         }
 
+        //reset start point
         if (!map_set)
         {
             int tile_rand = Random.Range(0, tiles.Length);
@@ -382,13 +407,13 @@ public class MapCreator : MonoBehaviour {
             tiles[tile_rand].GetComponent<SpriteRenderer>().sprite = junction;
         }
 
+        //destroy all spawned doors and keys
         for (int i = 0; i < doors_and_keys.Count; i++)
         {
             if (doors_and_keys[i])
             {
                 doors_and_keys[i].GetComponent<Door>().DestroyDoorAndKey();
-            }
-            
+            }            
         }
 
         doors_and_keys.Clear();
@@ -401,6 +426,10 @@ public class MapCreator : MonoBehaviour {
 
     public void AddTile()
     {
+        //tile changed 
+        //update UI
+        //reset timer
+
         tile_total++;
 
         tile_timer = 0.0f;
@@ -426,6 +455,9 @@ public class MapCreator : MonoBehaviour {
 
     public bool SpawnRoom(GameObject _door)
     {
+        //function to spawn a room
+
+        //random size
         int room_height = Random.Range(3, 8);
         int room_width = Random.Range(3, 8);
 
@@ -433,6 +465,7 @@ public class MapCreator : MonoBehaviour {
 
         GameObject[] room_floor_tiles = new GameObject[room_height * room_width];
 
+        //loop through positions room will take up
         if (door.sprite_rend.sprite = door_bottom)
         {
             room_floor_tiles[0] = door.adjacent_tiles[2];
@@ -445,6 +478,7 @@ public class MapCreator : MonoBehaviour {
                 }
             }
 
+            //if positions are already taken, room will not be spawned over the top
             for (int i = 1; i < room_width; i++)
             {
                 for (int j = 0; j < room_height; j++)
@@ -469,6 +503,7 @@ public class MapCreator : MonoBehaviour {
             room.id = room_id_num;
             room.door_floors[0] = _door; 
 
+            //assign random colour to door
             int rand_col_1 = Random.Range(0, 255);
             int rand_col_2 = Random.Range(0, 255);
             int rand_col_3 = Random.Range(0, 255);
@@ -498,6 +533,7 @@ public class MapCreator : MonoBehaviour {
 
             room_text.text = "Rooms: " + rooms.ToString() + " / " + rooms_required.ToString();
 
+            //assign room tiles
             for (int i = 0; i < room_floor_tiles.Length; i++)
             {
                 if (room_floor_tiles[i])
@@ -522,8 +558,10 @@ public class MapCreator : MonoBehaviour {
 
     void SpawnDoorSystem()
     {
+        //function to spawn doors onto rooms
         for (int i = 0; i < room_stats.Count; i++)
         {
+            //spawn door on original room opening and save to data
             TileScript door = room_stats[i].door_floors[0].GetComponent<TileScript>();
 
             map_data.doors.Add(room_stats[i].door_floors[0].GetComponent<TileScript>().id);
@@ -538,13 +576,12 @@ public class MapCreator : MonoBehaviour {
 
             doors_and_keys.Add(door_pref);
 
+            //spawn doors in other openings (current doesn't save to data)
             for (int j = 1; j < 4; j++)
             {
                 if (room_stats[i].door_floors[j])
                 {
                     GameObject door_ad = Instantiate(door_prefab, room_stats[i].door_floors[j].transform.position, room_stats[i].door_floors[j].transform.rotation);
-
-                    //map_data.doors.Add(room_stats[i].door_floors[0].GetComponent<TileScript>().id);
 
                     door_ad.GetComponent<SpriteRenderer>().color = room_stats[i].door_colour;
                     door_ad.GetComponent<Door>().floor = room_stats[i].door_floors[j].GetComponent<TileScript>();
@@ -573,16 +610,19 @@ public class MapCreator : MonoBehaviour {
 
     public void CreateGame(GameManager _manager)
     {
+        //called by game manager to get map data
         _manager.CreateMap(map_data.map, map_data.grid_size, map_data.spawn_point, map_data.doors, map_data.keys);
     }
 
     public void PlayGame()
     {
+        //load game scene
         UnityEngine.SceneManagement.SceneManager.LoadScene("game");
     }
 
     public void AddKey(int _id)
     {
+        //reference to spawned key
         map_data.keys.Add(_id);
     }
 }

@@ -9,6 +9,7 @@ public static class FileManagement
 {
     public static void SaveFile(MapData _map, String _file_name)
     {
+        //save new file with data
         BinaryFormatter bf = new BinaryFormatter();
         FileStream stream = new FileStream(Application.persistentDataPath + "/" + _file_name + ".dat", FileMode.Create);
 
@@ -20,6 +21,7 @@ public static class FileManagement
 
     public static void SaveFilesList(FilesList _files)
     {
+        //save list of available files
         BinaryFormatter bf = new BinaryFormatter();
         FileStream stream = new FileStream(Application.persistentDataPath + "/FileList.dat", FileMode.Create);
 
@@ -31,6 +33,7 @@ public static class FileManagement
 
     public static List<string> LoadFilesList()
     {
+        //load available files
         if (File.Exists(Application.persistentDataPath + "/FileList.dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -51,6 +54,7 @@ public static class FileManagement
 
     public static int[] LoadMap(String _file_name)
     {
+        //load map file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -71,6 +75,7 @@ public static class FileManagement
 
     public static int LoadMapRooms(String _file_name)
     {
+        //load room file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -91,6 +96,7 @@ public static class FileManagement
 
     public static int LoadMapSize(String _file_name)
     {
+        //load map size file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -111,6 +117,7 @@ public static class FileManagement
 
     public static int LoadSpawnPoint(String _file_name)
     {
+        //load spawn point file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -132,6 +139,7 @@ public static class FileManagement
 
     public static List<int> LoadDoors(String _file_name)
     {
+        //load door file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -152,6 +160,7 @@ public static class FileManagement
 
     public static List<int> LoadKeys(String _file_name)
     {
+        //load key file data
         if (File.Exists(Application.persistentDataPath + "/" + _file_name + ".dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();
@@ -173,13 +182,14 @@ public static class FileManagement
     [Serializable]
     public class Map
     {
-        public string name;
-        public int[] map;
-        public int rooms = 0;
-        public int grid_size = 0;
-        public int spawn_point = 0;
-        public List<int> doors;
-        public List<int> keys;
+        //saved data
+        public string name; //file name
+        public int[] map; //tile pieces
+        public int rooms = 0; //number of rooms
+        public int grid_size = 0; // size of grid
+        public int spawn_point = 0; // spawn point in grid
+        public List<int> doors; //door positions
+        public List<int> keys; //key positions
 
         public Map(MapData _map)
         {
@@ -196,6 +206,7 @@ public static class FileManagement
     [Serializable]
     public class Files
     {
+        //files
         public List<string> file_names;
 
         public Files(FilesList _files)

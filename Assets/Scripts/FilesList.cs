@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FilesList : MonoBehaviour
 {
-    public List<string> file_names;
+    public List<string> file_names; //list of saved files
 
     void Start()
     {
@@ -13,16 +13,19 @@ public class FilesList : MonoBehaviour
 
     public void Save()
     {
+        //save files
         FileManagement.SaveFilesList(this);
     }
 
     public void Load()
     {
+        //load files
         file_names = FileManagement.LoadFilesList();
     }
 
     public void AddFile(string _file)
     {
+        //add new file
         if (file_names == null)
         {
             file_names = new List<string>();

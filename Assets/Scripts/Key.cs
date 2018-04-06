@@ -17,11 +17,13 @@ public class Key : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        //spin key
         transform.Rotate((Vector3.up * Time.deltaTime) * spin_speed);
     }
 
     void OnTriggerEnter(Collider other)
     {
+        //collect key
         game_manager.CollectKey(this.gameObject.GetComponent<Renderer>().material.color);
 
         Destroy(this.gameObject);

@@ -4,29 +4,29 @@ using UnityEngine;
 
 public class TileScript : MonoBehaviour {
 
+    [Header("Parameters")]
     public int id;
     public int tile_type;
     public int value;
 
+    //which way the tunnel can go
     public bool open_up = false;
     public bool open_down = false;
     public bool open_left = false;
     public bool open_right = false;
 
+    //if tile has already been assigned 
     public bool tile_already_set = false;
     public bool room_tile_already_set = false;
 
-    public SpriteRenderer sprite_rend;
-    private int difficulty;
     public int room_id;
-    private float delay_timer = 0.0f;
-    private float delay_threshold = 0.075f;
-    private bool timer_on = false;
-    private bool spawn_rooms = false;
-    private bool updated_map_creator = false;
 
-    private MapCreator map_creator;
+    [Header("References")]
+    public GameObject[] adjacent_tiles; //the 4 adjacent tiles 
+    public SpriteRenderer sprite_rend;    
 
+    [Header("Sprite References")]
+    //all possible sprites to use
     [SerializeField] Sprite bottom_left;
     [SerializeField] Sprite bottom_right;
     [SerializeField] Sprite top_left;
@@ -62,7 +62,18 @@ public class TileScript : MonoBehaviour {
 
     [SerializeField] Sprite blank;
 
-    public GameObject[] adjacent_tiles;
+    //*deprecated* difficult/chance to deviate current path
+    private int difficulty;
+
+    //timer for tile placement delay
+    private float delay_timer = 0.0f;
+    private float delay_threshold = 0.075f;
+
+    private bool timer_on = false;
+    private bool spawn_rooms = false; //whether or not to spawn rooms
+    private bool updated_map_creator = false; //check if current map state is saved
+
+    private MapCreator map_creator;
 
     // Use this for initialization
     void Start ()
@@ -80,6 +91,7 @@ public class TileScript : MonoBehaviour {
         SetTile();
         EdgeCases();
 
+        //update state when assigned
         if ((sprite_rend.sprite != blank) && (!updated_map_creator))
         {
             updated_map_creator = true;
@@ -104,6 +116,7 @@ public class TileScript : MonoBehaviour {
 
     public void LoadTile()
     {
+        //function to set correct sprite
         switch (tile_type)
         {
             case 1:
@@ -186,6 +199,7 @@ public class TileScript : MonoBehaviour {
 
     public void SetType()
     {
+        //function to assign sprite type when saving
         if (sprite_rend.sprite == bottom_left)
         {
             tile_type = 1;
@@ -314,6 +328,7 @@ public class TileScript : MonoBehaviour {
 
     public void ResetTile()
     {
+        //reset everything
         open_down = false;
         open_left = false;
         open_right = false;
@@ -327,6 +342,8 @@ public class TileScript : MonoBehaviour {
 
     void OnMouseDown()
     {
+        //function to spawn new tunnels when clicked on
+        //defaults to 4-way junction if not adjacent to other tunnels
         if (sprite_rend.sprite == blank)
         {
             bool tunnel_top = false;
@@ -382,44 +399,45 @@ public class TileScript : MonoBehaviour {
 
     void OnTriggerStay2D(Collider2D other)
     {
-        //if (other.tag == "Tile")
+        //assign adjacent tiles when they spawn
+        //only triggered once per tile
+        if (!adjacent_tiles[3])
         {
-            if (!adjacent_tiles[3])
+            if ((other.transform.position.x < transform.position.x) && (other.transform.position.y == transform.position.y))
             {
-                if ((other.transform.position.x < transform.position.x) && (other.transform.position.y == transform.position.y))
-                {
-                    adjacent_tiles[3] = other.gameObject;
-                }
+                adjacent_tiles[3] = other.gameObject;
             }
+        }
 
-            if (!adjacent_tiles[0])
+        if (!adjacent_tiles[0])
+        {
+            if ((other.transform.position.x == transform.position.x) && (other.transform.position.y < transform.position.y))
             {
-                if ((other.transform.position.x == transform.position.x) && (other.transform.position.y < transform.position.y))
-                {
-                    adjacent_tiles[0] = other.gameObject;
-                }
+                adjacent_tiles[0] = other.gameObject;
             }
+        }
 
-            if (!adjacent_tiles[1])
+        if (!adjacent_tiles[1])
+        {
+            if ((other.transform.position.x > transform.position.x) && (other.transform.position.y == transform.position.y))
             {
-                if ((other.transform.position.x > transform.position.x) && (other.transform.position.y == transform.position.y))
-                {
-                    adjacent_tiles[1] = other.gameObject;
-                }
+                adjacent_tiles[1] = other.gameObject;
             }
+        }
 
-            if (!adjacent_tiles[2])
+        if (!adjacent_tiles[2])
+        {
+            if ((other.transform.position.x == transform.position.x) && (other.transform.position.y > transform.position.y))
             {
-                if ((other.transform.position.x == transform.position.x) && (other.transform.position.y > transform.position.y))
-                {
-                    adjacent_tiles[2] = other.gameObject;
-                }
+                adjacent_tiles[2] = other.gameObject;
             }
         }
     }
 
     public void SetTile()
     {
+        //check if adjacent tiles are open
+        //if so change sprite to match
         for (int i = 0; i < adjacent_tiles.Length; i++)
         {
             if (adjacent_tiles[i])
@@ -473,13 +491,18 @@ public class TileScript : MonoBehaviour {
 
     void ChangeRoomTile()
     {
+        //assign room sprite function
+        //gets adjacent tile if available
+        //sets to room door sprite
+        //saves relavent data
+
         timer_on = true;
 
         if (timer_on)
         {
             delay_timer += Time.deltaTime;
         }
-
+        
         if (delay_timer > delay_threshold)
         {
             timer_on = false;
@@ -703,6 +726,9 @@ public class TileScript : MonoBehaviour {
 
     void EdgeCases()
     {
+        //function to check edge cases of sprites 
+        //reassigns sprite if tile does not match correctly 
+
         if ((open_down) && (open_left) && (open_right) && (open_up) && (sprite_rend.sprite != junction))
         {
             sprite_rend.sprite = junction;
@@ -996,6 +1022,13 @@ public class TileScript : MonoBehaviour {
 
     void ChangeTile()
     {
+        //function to assign sprite 
+
+        //for each direction
+        //assign random value
+        //acts as percentage/chance to change direction or spawn a room
+        //assign relavent sprite
+
         timer_on = true;
 
         if (timer_on)
@@ -1011,7 +1044,7 @@ public class TileScript : MonoBehaviour {
             if (!tile_already_set)
             {
                 if (open_down)
-                {
+                {                    
                     int tile_rand = Random.Range(0, difficulty);
 
                     if (tile_rand <= difficulty - 5)
@@ -1075,21 +1108,9 @@ public class TileScript : MonoBehaviour {
                     }
 
                     if (tile_rand == difficulty - 4)
-                    {
-                        //if (spawn_rooms)
-                        //{ 
-                        //    sprite_rend.sprite = door_top;
-                        //    gameObject.tag = "RoomTileWall";
-                        //    room_tile_already_set = true;
-
-                        //    map_creator.SpawnRoom(this.gameObject);
-                        //}
-
-                        //else
-                        {
-                            ChangeTile();
-                            return;
-                        }
+                    {                        
+                        ChangeTile();
+                        return;                        
                     }
 
                     if (tile_rand == difficulty - 3)
@@ -1127,20 +1148,9 @@ public class TileScript : MonoBehaviour {
 
                     if (tile_rand == difficulty - 4)
                     {
-                        //if (spawn_rooms)
-                        //{
-                        //    sprite_rend.sprite = door_left;
-                        //    gameObject.tag = "RoomTileWall";
-                        //    room_tile_already_set = true;
-
-                        //    map_creator.SpawnRoom(this.gameObject);
-                        //}
-
-                        //else
-                        {
-                            ChangeTile();
-                            return;
-                        }
+                        ChangeTile();
+                        return;
+                        
                     }
 
                     if (tile_rand == difficulty - 3)
@@ -1178,20 +1188,8 @@ public class TileScript : MonoBehaviour {
 
                     if (tile_rand == difficulty - 4)
                     {
-                        //if (spawn_rooms)
-                        //{
-                        //    sprite_rend.sprite = door_right;
-                        //    gameObject.tag = "RoomTileWall";
-                        //    room_tile_already_set = true;
-
-                        //    map_creator.SpawnRoom(this.gameObject);
-                        //}
-
-                        //else
-                        {
-                            ChangeTile();
-                            return;
-                        }
+                        ChangeTile();
+                        return;                        
                     }
 
                     if (tile_rand == difficulty - 3)

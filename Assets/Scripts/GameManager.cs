@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
+    [Header("Sprite References")] //sprites to reference
     [SerializeField] GameObject wall_prefab;
     [SerializeField] GameObject floor_prefab;
     [SerializeField] GameObject door_prefab;
@@ -13,31 +14,34 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject key_UI_prefab;
     [SerializeField] GameObject player;
 
+    [Header("References")] //outer walls to dungeons
     [SerializeField] List<GameObject> outer_walls;
 
-    private int[] map = new int[3];
-    private List<GameObject> floor_tiles = new List<GameObject>();
+
+    private int[] map = new int[3]; //map data
+    private List<GameObject> floor_tiles = new List<GameObject>(); //tiles
     private MapCreator map_creator;
 
-    private List<Color> keys_collected = new List<Color>();
-    private List<GameObject> keys_ui = new List<GameObject>();
+    private List<Color> keys_collected = new List<Color>(); //picked up keys
+    private List<GameObject> keys_ui = new List<GameObject>(); //UI for collected keys
 
-    private int doors_opened = 0;
+    private int doors_opened = 0; 
     private int locked_doors = 0;
 
     void Awake()
     {
-        map_creator = (MapCreator)FindObjectOfType(typeof(MapCreator));
-              
+        map_creator = (MapCreator)FindObjectOfType(typeof(MapCreator));              
     }
 
     void Start()
     {
+        //get map data
         map_creator.CreateGame(this);
     }
 
     void Update()
     {
+        //reassign new key UI positions
         for (int i = 0; i < keys_ui.Count; i++)
         {
             float pos = -600 + (i * 100);
@@ -55,6 +59,9 @@ public class GameManager : MonoBehaviour {
 
     public void CreateMap(int[] _map, int _size, int _spawn, List<int> _doors, List<int> _keys)
     {
+        //function to spawn map
+
+        //set fog settings
         RenderSettings.fog = true;
         RenderSettings.fogDensity = 0.2f;
         RenderSettings.fogColor = Color.black;
@@ -65,23 +72,20 @@ public class GameManager : MonoBehaviour {
 
         Vector3 new_pos;
 
+        //assign surrounding wall positions
         new_pos = outer_walls[1].transform.position;
-
         new_pos.z += _size * 2;
         new_pos.z -= 1;
-
         outer_walls[1].transform.position = new_pos;
-
         new_pos = outer_walls[3].transform.position;
-
         new_pos.x += _size * 2;
         new_pos.x -= 1;
-
         outer_walls[3].transform.position = new_pos;
 
         float width = 0;
         float height = 0;
 
+        //spawn map pieces
         for (int i = 0; i < _size; i++)
         {
             for (int j = 0; j < _size; j++)
@@ -90,6 +94,7 @@ public class GameManager : MonoBehaviour {
 
                 int map_num = map[i + _size * j];
 
+                //if not tunnel or room then spawn wall piece
                 if ((map_num == 25) || (map_num == 9) || (map_num == 10) || 
                         (map_num == 11) || (map_num == 12) || (map_num == 13)
                          || (map_num == 14) || (map_num == 15) || (map_num == 16))
@@ -98,6 +103,7 @@ public class GameManager : MonoBehaviour {
                     floor_tiles.Add(wall);            
                 }
 
+                //otherwise spawn floor/tunnel
                 else
                 {
                     spawn_pos.y = 0;
@@ -106,6 +112,7 @@ public class GameManager : MonoBehaviour {
                     floor_tiles.Add(floor);
                 }
 
+                //set spawn position for player
                 if ((i + _size * j) == _spawn)
                 {
                     player.transform.position = spawn_pos;
@@ -117,6 +124,7 @@ public class GameManager : MonoBehaviour {
             width = 0.0f;
         }        
 
+        //spawn doors if door and key match
         for (int i = 0; i < _doors.Count; i++)
         {
             if (i < _keys.Count)
@@ -135,6 +143,7 @@ public class GameManager : MonoBehaviour {
 
                     GameObject key = Instantiate(key_prefab, spawn_pos, Quaternion.identity);
 
+                    //random matching colour
                     int rand_col_1 = Random.Range(0, 255);
                     int rand_col_2 = Random.Range(0, 255);
                     int rand_col_3 = Random.Range(0, 255);
@@ -149,6 +158,7 @@ public class GameManager : MonoBehaviour {
 
     public void CollectKey(Color _color)
     {
+        //collect key function
         keys_collected.Add(_color);
 
         GameObject key = Instantiate(key_UI_prefab, new Vector3(0, 0, 0), Quaternion.identity);
@@ -160,6 +170,8 @@ public class GameManager : MonoBehaviour {
 
     public bool CheckKey(Color _color)
     {
+        //check if key matches door
+        //if so, open door
         for (int i = 0; i < keys_collected.Count; i++)
         {
             if (_color == keys_collected[i])
@@ -172,6 +184,7 @@ public class GameManager : MonoBehaviour {
 
                 doors_opened++;
 
+                //if all doors opened, go back to map creator (currently no delay on this)
                 if (doors_opened == locked_doors)
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene("main");
